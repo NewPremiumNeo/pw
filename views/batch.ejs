@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batches</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      background-color: #1e1e1e;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      height: 100vh;
+    }
+
+    .card {
+      background-color: #333;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.6rem;
+      overflow: hidden;
+    }
+
+    .card h2 {
+      margin-bottom: 1rem;
+    }
+
+    .card img {
+      max-width: 300px;
+      height: auto;
+      /* Ensures the image maintains its aspect ratio */
+      border-radius: 10px;
+    }
+
+    .card div {
+      background-color: white;
+      width: 150%;
+      height: 1.54px;
+      margin: 0.7rem 0;
+    }
+
+    .card a {
+      display: inline-block;
+      text-decoration: none;
+      background-color: white;
+      color: blue;
+      text-align: center;
+      padding: 1.25rem;
+      width: 100%;
+      border-radius: 10px;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <% paidBatch.data.forEach(course=> { %>
+      <div class="card">
+        <h2>
+          <%= course.name %>
+        </h2>
+        <img src="<%= course.previewImage %>" alt="<%= course.name %>">
+        <div>
+        </div>
+        <a href="/batches/<%= course.slug %>/details">Let's Study</a>
+      </div>
+      <% }); %>
+
+        <% freeBatch.data.forEach(course=> { %>
+          <div class="card">
+            <h2>
+              <%= course.name %>
+            </h2>
+            <img src="<%= course.previewImage %>" alt="<%= course.name %>">
+            <div>
+            </div>
+              <a href="/batches/<%= course.slug %>/details">Let's Study</a>
+          </div>
+          <% }); %>
+
+  </div>
+</body>
+
+</html>
