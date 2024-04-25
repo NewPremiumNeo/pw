@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject List Details</title>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .mat-card {
+            display: inline-block;
+            width: 350px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .border-left {
+            border-left: 4px solid #8c81e9;
+            padding-left: 10px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .tile-title {
+            font-size: 1.25rem;
+            margin-bottom: 0;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .tile-subtitle {
+            font-size: 1rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .vl {
+            border-left: 1px solid #8c81e9;
+            height: 1rem;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <% subjectListDetails.chapters.forEach(course=> { %>
+            <a href="/saved/batches/<%= batchNameSlug %>/subject/<%= subjectSlug %>/contents/<%= course.slug %>" class="mat-card">
+                <div class="border-left">
+                    <h3 class="tile-title">
+                        <%= course.name %>
+                    </h3>
+                    <span class="tile-subtitle">All Videos <%= course.videos %><span class="vl"></span>All Exercises <%=
+                                course.exercises %><span class="vl"></span>All Notes <%= course.notes %></span>
+                </div>
+            </a>
+            <% }); %>
+
+    </div>
+</body>
+
+</html>

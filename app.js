@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 
 import indexRouter from './routes/index.js';
-
+import './models/connectDB.js'
 var app = express();
 
 // view engine setup
@@ -38,7 +38,7 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-const port = 3000
+const port = process.env.PORT || 3000
 
 const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
