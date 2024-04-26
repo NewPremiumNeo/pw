@@ -4,6 +4,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
+import dotenv from 'dotenv';
+dotenv.config();
 
 import indexRouter from './routes/index.js';
 import './models/connectDB.js'

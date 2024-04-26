@@ -3,7 +3,7 @@ import fetch from 'node-fetch'; // Import fetch for making HTTP requests
 async function findKey(url) {
     try {
         console.log("Finding Keys for ", url)
-        url = `https://extractapi.xyz/drm.php?v=${url}`
+        url = `https://extractkey.vercel.app/pw?videourl=${url}`
         const response = await fetch(url, {
             method: "GET",
         });
@@ -13,8 +13,8 @@ async function findKey(url) {
         }
 
         const data = await response.json();
-        console.log("Got Keys ", data.keys[0])
-        return data.keys[0]; 
+        console.log("Got Keys ", data)
+        return data; 
     } catch (error) {
         console.error(`Error: ${error.message}`);
         throw error;
