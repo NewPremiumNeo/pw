@@ -19,9 +19,10 @@ async function findKey(url) {
 
         const data = await response.json(); // Convert response to JSON format
         console.log("Got Keys ", data.keys[0])
-        return data.keys[0]; // Return keys[0]
+        return data.keys[0]; 
     } catch (error) {
-        throw new Error(`Error: ${error.message}`);
+        console.error(`Error: ${error.message}`);
+        throw error;
     }
 }
 
