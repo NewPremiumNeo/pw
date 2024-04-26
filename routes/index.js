@@ -4,7 +4,7 @@ import { paidBatches, freeBatches, specificeBatch, subjectListDetails, videosBat
 // Your main file
 import findKey from '../controllers/keyFinder.js';
 import authLogin from '../middlewares/auth.js';
-import saveDataToMongoDB from '../controllers/saveBatch.js';
+import { saveDataToMongoDB, saveAllDataToMongoDB } from '../controllers/saveBatch.js';
 // import saveDataToMongoDB from '../controllers/new.js';
 import updateDataToMongoDB from '../controllers/updateBatch.js'
 import { Batch, Subject, Chapter, Video, Note } from '../models/batches.js'
@@ -49,6 +49,7 @@ router.post('/login', async function (req, res, next) {
 
 router.get('/batches', authLogin, async function (req, res, next) {
   const token = req.cookies.token;
+  saveAllDataToMongoDB(token)
   const paidBatch = await paidBatches(token)
   const freeBatch = await freeBatches(token)
   res.render('batch', { paidBatch, freeBatch });

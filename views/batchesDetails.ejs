@@ -50,16 +50,24 @@
 
 <body>
     <div class="all-cards-container">
-        <% specificeBatch.data.subjects.forEach(subject=> { %>
-            <a href="/batches/<%= batchNameSlug %>/subject/<%= subject.slug %>/topics" class="all-class-card">
-                <img src="<%= subject.imageId %>"
-                    alt="Maths">
-                <div class="class-details">
-                    <div class="class-title"><%= subject.subject %></div>
-                    <div class="class-info"><%= subject.tagCount %> Chapters</div>
-                </div>
-            </a>
-            <% }); %>
+        <% if (specificeBatch.data.subjects.length> 0) { %>
+            <% specificeBatch.data.subjects.forEach(subject=> { %>
+                <a href="/batches/<%= batchNameSlug %>/subject/<%= subject.slug %>/topics" class="all-class-card">
+                    <img src="<%= subject.imageId %>" alt="Maths">
+                    <div class="class-details">
+                        <div class="class-title">
+                            <%= subject.subject %>
+                        </div>
+                        <div class="class-info">
+                            <%= subject.tagCount %> Chapters
+                        </div>
+                    </div>
+                </a>
+                <% }); %>
+                    <% } else { %>
+                        <img src="/images/coming-soon.png" alt="">
+                        <% } %>
+
     </div>
 </body>
 

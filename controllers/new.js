@@ -13,8 +13,6 @@ async function saveDataToMongoDB(token, batchSlug) {
 
         // Fetch batch data
         const batchData = await paidBatches(token);
-        console.log(Array.isArray(batchData.data))
-        console.log(batchData)
         
         // Use for...of loop to iterate over batchData.data and await each saveBatchData call
         for (const course of batchData.data) {

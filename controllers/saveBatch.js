@@ -34,6 +34,28 @@ async function saveDataToMongoDB(token, batchSlug) {
     }
 }
 
+async function saveAllDataToMongoDB(token) {
+    try {
+        let batchData = await paidBatches(token);
+
+        batchData.data.forEach(async course => {
+            const batch = await Batch.findOne({ slug: course.slug });
+            if (!batch) {
+                await saveBatchData(course);
+                await saveSubjectData(token, course.slug);
+                console.log('Data saved successfully :- ', course.slug);
+            }
+            else {
+                console.log('Batch Already Exist!!');
+            }
+        });
+
+        console.log('All data saved successfully.');
+    } catch (error) {
+        console.error('Error saving data:', error.message);
+    }
+}
+
 async function saveBatchData(batchData) {
     try {
         const batch = new Batch({
@@ -322,7 +344,7 @@ async function saveDppsData(token, batchSlug, subjectSlug, chapterSlug) {
             chapter.dppSch.push({
                 topic: note.topic,
                 note: note.note,
-                pdfName: note.pdfName, 
+                pdfName: note.pdfName,
                 pdfUrl: note.pdfUrl
             });
         }
@@ -334,4 +356,4 @@ async function saveDppsData(token, batchSlug, subjectSlug, chapterSlug) {
     }
 }
 
-export default saveDataToMongoDB;
+export { saveDataToMongoDB, saveAllDataToMongoDB };

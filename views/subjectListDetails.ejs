@@ -56,17 +56,22 @@
 
 <body>
     <div class="container">
-        <% subjectListDetails.data.forEach(course=> { %>
-            <a href="/batches/<%= batchNameSlug %>/subject/<%= subjectSlug %>/contents/<%= course.slug %>" class="mat-card">
-                <div class="border-left">
-                    <h3 class="tile-title">
-                        <%= course.name %>
-                    </h3>
-                    <span class="tile-subtitle">All Videos <%= course.videos %><span class="vl"></span>All Exercises <%=
-                                course.exercises %><span class="vl"></span>All Notes <%= course.notes %></span>
-                </div>
-            </a>
-            <% }); %>
+        <% if (subjectListDetails.data.length> 0) { %>
+            <% subjectListDetails.data.forEach(course=> { %>
+                <a href="/batches/<%= batchNameSlug %>/subject/<%= subjectSlug %>/contents/<%= course.slug %>"
+                    class="mat-card">
+                    <div class="border-left">
+                        <h3 class="tile-title">
+                            <%= course.name %>
+                        </h3>
+                        <span class="tile-subtitle">All Videos <%= course.videos %><span class="vl"></span>All Exercises
+                                <%= course.exercises %><span class="vl"></span>All Notes <%= course.notes %></span>
+                    </div>
+                </a>
+                <% }); %>
+                    <% } else { %>
+                        <img src="/images/coming-soon.png" alt="">
+                        <% } %>
 
     </div>
 </body>
