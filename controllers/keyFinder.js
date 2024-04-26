@@ -1,4 +1,3 @@
-// keyFinder.js
 import fetch from 'node-fetch'; // Import fetch for making HTTP requests
 
 async function findKey(url) {
@@ -6,14 +5,12 @@ async function findKey(url) {
         console.log("Finding Keys for ", url)
         url = `https://extractapi.xyz/drm.php?v=${url}`
         const response = await fetch(url, {
-            credentials: "omit",
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0",
-                "Accept": "application/json", // Request JSON response
+                "Accept": "application/json", 
                 "Accept-Language": "en-US,en;q=0.5",
             },
             method: "GET",
-            mode: "cors"
         });
 
         if (!response.ok) {
@@ -24,7 +21,7 @@ async function findKey(url) {
         console.log("Got Keys ", data.keys[0])
         return data.keys[0]; // Return keys[0]
     } catch (error) {
-        throw new Error('Error:', error);
+        throw new Error(`Error: ${error.message}`);
     }
 }
 
