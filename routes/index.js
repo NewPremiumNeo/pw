@@ -118,8 +118,12 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:
 
 router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;
-  const key = await findKey(videoUrl)
-  res.render('player', { videoUrl, key });
+  try {
+    const key = await findKey(videoUrl)
+    res.render('player', { videoUrl, key });
+  } catch (error) {
+    res.send("Server Error: ", error.message)
+  }
 });
 
 
