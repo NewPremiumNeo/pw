@@ -1,8 +1,7 @@
 import fetch from 'node-fetch';
 
 async function paidBatches(token) {
-    // const url = 'https://api.penpencil.co/v3/batches/my-batches?mode=1&amount=paid&page=1';
-    const url = 'https://api.penpencil.co/v3/batches/my-batches?mode=paid&page=1';
+    const url = 'https://api.penpencil.co/v3/batches/my-batches?mode=1&amount=paid&page=1';
     const headers = {
         'Authorization': `Bearer ${token}`
     };
@@ -28,8 +27,7 @@ async function paidBatches(token) {
 }
 
 async function freeBatches(token) {
-    // const url = 'https://api.penpencil.co/v3/batches/my-batches?mode=1&amount=free&page=1';
-    const url = 'https://api.penpencil.co/v3/batches/my-batches?mode=free&page=1';
+    const url = 'https://api.penpencil.co/v3/batches/my-batches?mode=1&amount=free&page=1';
     const headers = {
         'Authorization': `Bearer ${token}`
     };
