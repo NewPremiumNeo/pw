@@ -27,6 +27,7 @@ async function saveDataToMongoDB(token, batchSlug) {
 
         // Fetch and save subject data for each batch
         await saveSubjectData(token, batchSlug);
+        console.log('Batch Saved :- ', course.name);
 
         console.log('All data saved successfully.');
     } catch (error) {
@@ -43,7 +44,7 @@ async function saveAllDataToMongoDB(token) {
             if (!batch) {
                 await saveBatchData(course);
                 await saveSubjectData(token, course.slug);
-                console.log('Data saved successfully :- ', course.slug);
+                console.log('Batch Saved :- ', course.name);
             }
             else {
                 console.log('Batch Already Exist!!');
@@ -95,10 +96,11 @@ async function saveSubjectData(token, batchSlug) {
 
         await batch.save();
         console.log('Subject data saved successfully.');
-
+        
         // Fetch and save chapter data for each subject
         for (const subject of subjectData.data.subjects) {
             await saveChapterData(token, batchSlug, subject.slug);
+            console.log('Subject Saved', subject.subject);
         }
     } catch (error) {
         console.error('Error saving subject data:', error.message);
@@ -146,6 +148,7 @@ async function saveChapterData(token, batchSlug, subjectSlug) {
             await saveNotesData(token, batchSlug, subjectSlug, chapter.slug);
             await saveDppsData(token, batchSlug, subjectSlug, chapter.slug);
             await saveDppVideoData(token, batchSlug, subjectSlug, chapter.slug);
+            console.log("Chapter Saved ", chapter.name)
         }
     } catch (error) {
         console.error('Error saving chapter data:', error.message);
@@ -205,7 +208,7 @@ async function saveVideoData(token, batchSlug, subjectSlug, chapterSlug) {
         }
 
         await batch.save();
-        console.log('Video data saved successfully.');
+        // console.log('Video data saved successfully.');
     } catch (error) {
         console.error('Error saving video data:', error.message);
     }
@@ -248,7 +251,7 @@ async function saveNotesData(token, batchSlug, subjectSlug, chapterSlug) {
         }
 
         await batch.save();
-        console.log('Notes data saved successfully.');
+        // console.log('Notes data saved successfully.');
     } catch (error) {
         console.error('Error saving notes data:', error.message);
     }
@@ -307,7 +310,7 @@ async function saveDppVideoData(token, batchSlug, subjectSlug, chapterSlug) {
         }
 
         await batch.save();
-        console.log('DPP Video data saved successfully.');
+        // console.log('DPP Video data saved successfully.');
     } catch (error) {
         console.error('Error saving DPP video data:', error.message);
     }
@@ -350,7 +353,7 @@ async function saveDppsData(token, batchSlug, subjectSlug, chapterSlug) {
         }
 
         await batch.save();
-        console.log('DPP data saved successfully.');
+        // console.log('DPP data saved successfully.');
     } catch (error) {
         console.error('Error saving DPP data:', error.message);
     }

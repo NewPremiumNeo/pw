@@ -127,8 +127,8 @@ async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug) {
                 videoDetails: {
                     name: item.videoDetails.name,
                     image: item.videoDetails.image,
-                    videoUrl: item.videoDetails.videoUrl || '',
-                    embedCode: item.videoDetails.embedCode || '',
+                    videoUrl: item.videoDetails.videoUrl ? item.videoDetails.videoUrl : '',
+                    embedCode: item.videoDetails.embedCode ? item.videoDetails.embedCode : '',
                     duration: item.videoDetails.duration
                 }
             };
@@ -230,8 +230,8 @@ async function dppVideos(token, batchNameSlug, subjectSlug, chapterSlug) {
                 videoDetails: {
                     name: item.videoDetails.name,
                     image: item.videoDetails.image,
-                    videoUrl: item.videoDetails.videoUrl || '',
-                    embedCode: item.videoDetails.embedCode || '',
+                    videoUrl: item.videoDetails.videoUrl ? item.videoDetails.videoUrl : '',
+                    embedCode: item.videoDetails.embedCode ? item.videoDetails.embedCode : '',
                     duration: item.videoDetails.duration
                 }
             };

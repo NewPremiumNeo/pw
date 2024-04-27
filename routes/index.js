@@ -49,7 +49,7 @@ router.post('/login', async function (req, res, next) {
 
 router.get('/batches', authLogin, async function (req, res, next) {
   const token = req.cookies.token;
-  saveAllDataToMongoDB(token)
+  // saveAllDataToMongoDB(token)
   const paidBatch = await paidBatches(token)
   const freeBatch = await freeBatches(token)
   res.render('batch', { paidBatch, freeBatch });
