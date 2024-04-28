@@ -21,6 +21,7 @@ router.get('/login', function (req, res, next) {
 
 router.post('/login', async function (req, res, next) {
   const token = req.body.token;
+  if(!token) res.send("<script>alert('Please Enter Token'); window.location.href='/login';</script>");
   const url = 'https://api.penpencil.co/v3/oauth/verify-token';
   const headers = {
     'Authorization': `Bearer ${token}`,
@@ -38,7 +39,7 @@ router.post('/login', async function (req, res, next) {
       res.cookie('token', token, { maxAge: 604800000, httpOnly: true });
       res.redirect('/batches');
     } else {
-      res.send("Token Expire");
+      res.send("<script>alert('Token Expried'); window.location.href='/login';</script>");
       res.redirect('/login');
     }
   } catch (error) {
@@ -90,7 +91,6 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug',
 router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:contentType', authLogin, async function (req, res, next) {
   const token = req.cookies.token;
   const contentType = req.params.contentType;
-  console.log(contentType)
   switch (contentType) {
     case "lectures":
       const videosBatchData = await videosBatch(token, req.params.batchNameSlug, req.params.subjectSlug, req.params.chapterSlug)
@@ -106,7 +106,6 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:
       break;
     case "dppVideos":
       const dppVideosData = await dppVideos(token, req.params.batchNameSlug, req.params.subjectSlug, req.params.chapterSlug)
-      console.log(dppVideosData)
       res.json(dppVideosData);
       break;
 
@@ -161,20 +160,5 @@ router.get('/saved/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapter
 });
 
 
-// router.get('/lol', async function (req, res, next) {
-//   // const batch = await Batch.find();
-//   let slug = "arjuna-jee-2-0-2023-234727";
-//   const batch = await Batch.findOne({ slug });
-//   if (batch) {
-//     const subjectListDetailsData = batch.subjects.find(sub => sub.slug === "maths-415754");
-//     const videosBatchData = subjectListDetailsData.chapters.find(sub => sub.slug === "ch-02---logarithm-956777");
-//     res.json(videosBatchData)
-//   } else {
-//     res.status(404).json({ message: "Batch not found" });
-//   }
-
-//   res.json(batch)
-
-// });
 
 export default router;

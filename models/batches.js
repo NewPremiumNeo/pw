@@ -65,6 +65,7 @@ const subjectSchema = new Schema({
     subject: String,
     imageId: String,
     slug: String,
+    tagCount: String,
     chapters: [chapterSchema]
 });
 
@@ -74,6 +75,7 @@ const batchSchema = new Schema({
     language: String,
     previewImage: String,
     slug: String,
+    token: String,
     subjects: [subjectSchema]
 });
 

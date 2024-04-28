@@ -10,6 +10,10 @@
 </head>
 
 <body>
+    <header>
+        <a href="/saved/batches/<%= batchNameSlug %>/subject/<%= subjectSlug %>/topics"><i class="ri-arrow-left-line"></i></i></a>
+        <h1><%= videosBatch.name %></h1>
+    </header>
     <section class="list overflow-x-auto no-scrollbar">
         <button id="lectures" class="active">Lectures</button>
         <button id="notes" class="inactive">Notes</button>
@@ -22,44 +26,54 @@
         <div id="lectures-content" batchNameSlug="<%= batchNameSlug %>" subjectSlug="<%= subjectSlug %>"
             chapterSlug="<%= chapterSlug %>">
             <section class="container">
+                <% if (videosBatch.videosSch.length> 0) { %>
                 <% videosBatch.videosSch.forEach(video=> { %>
                     <% if (video.videoDetails.videoUrl) { %>
                         <div video-url="<%= video.videoDetails.videoUrl %>" class="video-card"
                             onclick="sendVideoUrl(this)">
-                            <% } else { %>
-                                <div video-url="<%= video.videoDetails.embedCode %>" class="video-card"
-                                    onclick="freeVideoUrl(this)">
-                                    <% } %>
+                    <% } else { %>
+                        <div video-url="<%= video.videoDetails.embedCode %>" class="video-card"
+                            onclick="freeVideoUrl(this)">
+                    <% } %>
 
-                                        <div class="thumbnail-container">
-                                            <img class="thumbnail" src="<%= video.videoDetails.image %>"
-                                                alt="Thumbnail">
-                                            <img class="play-icon" src="/images/blue-play-icon.svg" alt="Play icon">
-                                        </div>
-                                        <div class="info">
-                                            <div class="info__time">
-                                                <div class="date">
-                                                    <%= video.date %>
+                            <div class="thumbnail-container">
+                                <img class="thumbnail" src="<%= video.videoDetails.image %>"
+                                    alt="Thumbnail">
+                                <img class="play-icon" src="/images/blue-play-icon.svg" alt="Play icon">
+                            </div>
+                            <div class="info">
+                                <div class="info__time">
+                                    <div class="date">
+                                        <%= video.date %>
+                                    </div>
+                                    <div class="duration">
+                                        <img class="clock-icon" src="/images/clock.svg" alt="Clock">
+                                        <span>
+                                            <%= video.videoDetails.duration %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <p class="title">
+                                    <% if (video.videoDetails.name.length > 60) { %>
+                                        <%= video.videoDetails.name.slice(0, 60) + '...' %>
+                                    <% } else { %>
+                                        <%= video.videoDetails.name %>
+                                    <% } %>
+                                </p>
+                            </div>
+                                        <% if (video.videoDetails.videoUrl) { %>
+                                            <% const parts=video.videoDetails.videoUrl.split('/'); const
+                                                videoId=parts[parts.length - 2]; %>
+                                                <div class="download"
+                                                    onclick="event.stopPropagation(); copyDownloadLink('<%= videoId %>')">
+                                                    <button>1dm Download Link</button>
                                                 </div>
-                                                <div class="duration">
-                                                    <img class="clock-icon" src="/images/clock.svg" alt="Clock">
-                                                    <span>
-                                                        <%= video.videoDetails.duration %>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <% if (video.videoDetails.name.split(' ').length > 10) { %>
-                                <p class="title"><%= video.videoDetails.name.split(' ').slice(0, 10).join(' ') + ' ...'
-                                                %>
-                                                </p>
-                                                <% } else { %>
-                                                    <p class="title">
-                                                        <%= video.videoDetails.name %>
-                                                    </p>
-                                                    <% } %>
-                                        </div>
+                                                <% } %>
                                 </div>
                                 <% }); %>
+                        <% } else { %>
+                            <img src="/images/coming-soon.png" alt="">
+                            <% } %>
 
             </section>
         </div>

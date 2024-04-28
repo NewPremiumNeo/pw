@@ -13,7 +13,32 @@ body {
     background-color: #1e1e1e;
     color: #fff;
     font-family: Arial, sans-serif;
-    padding-top: 5rem;
+}
+
+header{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+header div{
+    text-align: center; 
+    font-size: 2rem; 
+}
+header a{
+    text-decoration: none; 
+    border: 1px solid white;
+    border-radius: 50%;
+    display: inline-block;
+    padding: 0.5rem 0.6rem;
+}
+header a i{
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+    font-family: monospace;
 }
 
 .list {
@@ -24,9 +49,9 @@ body {
     border-radius: 8px;
     width: -moz-fit-content;
     width: fit-content;
-    max-width: 70vw;
+    max-width: 95vw;
     padding: 1rem 2rem;
-    margin-left: 10%;
+    margin: auto;
 }
 
 .list button {
@@ -110,7 +135,6 @@ body {
     align-items: center;
     justify-content: center;
     padding: 8px 12px;
-    padding-bottom: 2rem;
 }
 
 .info__time {
@@ -192,3 +216,37 @@ body {
     color: #5A4BDA;
     border: 3px solid rgba(0, 0, 0, 0.6);
 }
+
+.download{
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.download button{
+    background-color: #5A4BDA;
+    color: white;
+    border: none;
+    outline: none;
+    width: 95%;
+    border-radius: 10px;
+    padding: 1.4rem;  
+    cursor: pointer;  
+    font-size: 1.6rem;
+    font-weight: 600;
+    transition: 0.3s ease-in-out;
+}
+.download button:hover{
+    color: #5A4BDA;
+    background-color: white;
+}
+
+
+/* @media (max-width: 500px) {
+    .list {
+        margin: auto;
+      }
+} */

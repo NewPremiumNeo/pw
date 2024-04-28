@@ -17,6 +17,23 @@ function downloadPdf(url, filename) {
     anchor.click();
 }
 
+function copyDownloadLink(videoId, event) {
+    const dashboardLink = `https://psitoffers.store/1dm.php?vid=${videoId}`;
+    const tempInput = document.createElement('input');
+    tempInput.value = dashboardLink;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    tempInput.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    alert("1dm download link copied to your clipbord")
+}
+
+function extractVideoId(link) {
+    const parts = link.split('/');
+    const code = parts[parts.length - 2];
+    return code;
+}
 
 document.addEventListener('DOMContentLoaded', async function () {
     const buttons = document.querySelectorAll('.list button');
@@ -50,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     const response = await fetch(url);
                     if (buttonId == "lectures" || buttonId == "dppVideos") {
                         const videosBatch = await response.json();
-                        let videos = buttonId == "lectures" ? videosBatch.videosSch :  videosBatch.dppVideosSch
+                        let videos = buttonId == "lectures" ? videosBatch.videosSch : videosBatch.dppVideosSch
                         if (videos.length > 0) {
                             videos.forEach(video => {
                                 contentElementContainer.innerHTML += `
@@ -69,6 +86,10 @@ document.addEventListener('DOMContentLoaded', async function () {
                             </div>
                             <p class="title">${video.videoDetails.name.split(' ').length > 10 ? video.videoDetails.name.split(' ').slice(0, 10).join(' ') + ' ...' : video.videoDetails.name}</p>
                         </div>
+                            ${video.videoDetails.videoUrl ? `
+                            <div class="download" onclick="event.stopPropagation(); copyDownloadLink('${extractVideoId(video.videoDetails.videoUrl)}')">
+                                <button>1dm Download Link</button>
+                            </div>` : ''}
                     </div>`;
 
                             });
@@ -78,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     }
                     else if (buttonId == 'notes' || buttonId == 'dpp') {
                         const videoNotes = await response.json();
-                        let videos = buttonId == "notes" ? videoNotes.notesSch :  videoNotes.dppSch
+                        let videos = buttonId == "notes" ? videoNotes.notesSch : videoNotes.dppSch
                         if (videos.length > 0) {
                             videos.forEach(pdf => {
                                 contentElementContainer.innerHTML += `

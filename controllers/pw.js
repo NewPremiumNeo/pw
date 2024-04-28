@@ -87,8 +87,8 @@ async function specificeBatch(token, batchName) {
     }
 }
 
-async function subjectListDetails(token, batchNameSlug, subjectSlug) {
-    const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/topics?page=1`;
+async function subjectListDetails(token, batchNameSlug, subjectSlug, page = 1) {
+    const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/topics?page=${page}`;
     const headers = {
         'Authorization': `Bearer ${token}`
     };
@@ -102,12 +102,11 @@ async function subjectListDetails(token, batchNameSlug, subjectSlug) {
         // Handle data as needed
         return data;
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error.message);
     }
 }
-
-async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug) {
-    const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=1&contentType=videos&tag=${chapterSlug}`;
+async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page = 1, retryCount = 3 ) {
+    const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=${page}&contentType=videos&tag=${chapterSlug}`;
     const headers = {
         'Authorization': `Bearer ${token}`
     };
@@ -115,10 +114,17 @@ async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug) {
     try {
         const response = await fetch(url, { headers });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const status = response.status;
+            if (status === 429 && retryCount > 0) {
+                console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Retry the request
+                return await videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page, retryCount - 1 );
+            } else {
+                throw new Error(`HTTP error! status: ${status}`);
+            }
         }
         const data = await response.json();
-        // Handle data as needed
         const extractedData = [];
         data.data.forEach(item => {
             const extractedItem = {
@@ -139,11 +145,12 @@ async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug) {
         };
         return extractedJson;
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error.message);
+        throw error; // Re-throw the error to indicate failure
     }
 }
 
-async function videoNotes(token, batchNameSlug, subjectSlug, chapterSlug) {
+async function videoNotes(token, batchNameSlug, subjectSlug, chapterSlug, retryCount = 3) {
     const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=1&contentType=notes&tag=${chapterSlug}`;
     const headers = {
         'Authorization': `Bearer ${token}`
@@ -152,7 +159,15 @@ async function videoNotes(token, batchNameSlug, subjectSlug, chapterSlug) {
     try {
         const response = await fetch(url, { headers });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const status = response.status;
+            if (status === 429 && retryCount > 0) {
+                console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Retry the request
+                return await videoNotes(token, batchNameSlug, subjectSlug, chapterSlug, retryCount - 1);
+            } else {
+                throw new Error(`HTTP error! status: ${status}`);
+            }
         }
         const data = await response.json();
         const extractedData = [];
@@ -172,11 +187,12 @@ async function videoNotes(token, batchNameSlug, subjectSlug, chapterSlug) {
         };
         return extractedJson;
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error.message);
+        throw error; // Re-throw the error to indicate failure
     }
 }
 
-async function dppQuestions(token, batchNameSlug, subjectSlug, chapterSlug) {
+async function dppQuestions(token, batchNameSlug, subjectSlug, chapterSlug, retryCount = 3) {
     const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=1&contentType=DppNotes&tag=${chapterSlug}`;
     const headers = {
         'Authorization': `Bearer ${token}`
@@ -185,10 +201,17 @@ async function dppQuestions(token, batchNameSlug, subjectSlug, chapterSlug) {
     try {
         const response = await fetch(url, { headers });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const status = response.status;
+            if (status === 429 && retryCount > 0) {
+                console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Retry the request
+                return await dppQuestions(token, batchNameSlug, subjectSlug, chapterSlug, retryCount - 1);
+            } else {
+                throw new Error(`HTTP error! status: ${status}`);
+            }
         }
         const data = await response.json();
-
         const extractedData = [];
         data.data.forEach(item => {
             item.homeworkIds.forEach(homework => {
@@ -206,11 +229,12 @@ async function dppQuestions(token, batchNameSlug, subjectSlug, chapterSlug) {
         };
         return extractedJson;
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error.message);
+        throw error; // Re-throw the error to indicate failure
     }
 }
 
-async function dppVideos(token, batchNameSlug, subjectSlug, chapterSlug) {
+async function dppVideos(token, batchNameSlug, subjectSlug, chapterSlug, retryCount = 3) {
     const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=1&contentType=DppVideos&tag=${chapterSlug}`;
     const headers = {
         'Authorization': `Bearer ${token}`
@@ -219,7 +243,15 @@ async function dppVideos(token, batchNameSlug, subjectSlug, chapterSlug) {
     try {
         const response = await fetch(url, { headers });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const status = response.status;
+            if (status === 429 && retryCount > 0) {
+                console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Retry the request
+                return await dppVideos(token, batchNameSlug, subjectSlug, chapterSlug, retryCount - 1);
+            } else {
+                throw new Error(`HTTP error! status: ${status}`);
+            }
         }
         const data = await response.json();
         const extractedData = [];
@@ -242,7 +274,8 @@ async function dppVideos(token, batchNameSlug, subjectSlug, chapterSlug) {
         };
         return extractedJson;
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error.message);
+        throw error; // Re-throw the error to indicate failure
     }
 }
 

@@ -1,4 +1,3 @@
-import express from 'express';
 import fetch from 'node-fetch';
 
 // Middleware
@@ -23,7 +22,7 @@ async function authLogin(req, res, next) {
         if (data.success) {
             next(); // Call next middleware or route handler
         } else {
-            return res.send("Token Expire"); // Return after sending response
+            return res.redirect('/login'); // Return after sending response
         }
     } catch (error) {
         console.error('Error fetching data:', error);
