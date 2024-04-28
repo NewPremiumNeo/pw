@@ -65,10 +65,9 @@ async function specificeBatch(token, batchName) {
         const data = await response.json();
 
         const subjectData = data.data.subjects
-            .filter(item => item.imageId)
             .map(item => ({
                 subject: item.subject,
-                imageId: `${item.imageId.baseUrl}${item.imageId.key}`,
+                imageId: item.imageId ? `${item.imageId.baseUrl}${item.imageId.key}` : "",
                 slug: item.slug,
                 tagCount: item.tagCount
             }));
