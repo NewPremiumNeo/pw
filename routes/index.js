@@ -94,26 +94,26 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:
   switch (contentType) {
     case "lectures":
       const videosBatchData = await videosBatch(token, req.params.batchNameSlug, req.params.subjectSlug, req.params.chapterSlug)
-      res.json(videosBatchData);
+      return res.status(200).json(videosBatchData);
       break;
     case "notes":
       const videoNotesData = await videoNotes(token, req.params.batchNameSlug, req.params.subjectSlug, req.params.chapterSlug)
-      res.json(videoNotesData);
+      return res.status(200).json(videoNotesData);
       break;
     case "dpp":
       const dppQuestionsData = await dppQuestions(token, req.params.batchNameSlug, req.params.subjectSlug, req.params.chapterSlug)
-      res.json(dppQuestionsData);
+      return res.status(200).json(dppQuestionsData);
       break;
     case "dppVideos":
       const dppVideosData = await dppVideos(token, req.params.batchNameSlug, req.params.subjectSlug, req.params.chapterSlug)
-      res.json(dppVideosData);
+      return res.status(200).json(dppVideosData);
       break;
 
     default:
       break;
   }
   const videosBatchData = await videosBatch(token, req.params.batchNameSlug, req.params.subjectSlug, req.params.chapterSlug)
-  res.render('videosBatch', { videosBatch: videosBatchData });
+  return res.render('videosBatch', { videosBatch: videosBatchData });
 });
 
 router.get('/play', async function (req, res, next) {

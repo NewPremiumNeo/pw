@@ -21,7 +21,7 @@
         <% if (specificeBatch.data.subjects.length> 0) { %>
             <% specificeBatch.data.subjects.forEach(subject=> { %>
                 <a href="/batches/<%= batchNameSlug %>/subject/<%= subject.slug %>/topics" class="all-class-card">
-                    <img src="<%= subject.imageId %>" alt="Maths">
+                    <img src="<%= subject.imageId %>" alt="<%= subject.subject %>">
                     <div class="class-details">
                         <div class="tile-title">
                             <% if (subject.subject.length > 25) { %>

@@ -130,13 +130,14 @@ async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page 
                 topic: item.topic,
                 date: item.date,
                 videoDetails: {
-                    name: item.videoDetails.name,
-                    image: item.videoDetails.image,
+                    name: item.videoDetails.name ? item.videoDetails.name : '',
+                    image: item.videoDetails.image ? item.videoDetails.image : '',
                     videoUrl: item.videoDetails.videoUrl ? item.videoDetails.videoUrl : '',
                     embedCode: item.videoDetails.embedCode ? item.videoDetails.embedCode : '',
-                    duration: item.videoDetails.duration
+                    duration: item.videoDetails.duration ? item.videoDetails.duration : ''
                 }
             };
+            console.log("tem ",extractedItem)
             extractedData.push(extractedItem);
         });
         const extractedJson = {
@@ -173,9 +174,9 @@ async function videoNotes(token, batchNameSlug, subjectSlug, chapterSlug, retryC
         data.data.forEach(item => {
             item.homeworkIds.forEach(homework => {
                 const extractedItem = {
-                    topic: homework.topic,
-                    note: homework.note,
-                    pdfName: homework.attachmentIds[0].name,
+                    topic: homework.topic ? homework.topic : '',
+                    note: homework.note ? homework.note : '',
+                    pdfName: homework.attachmentIds[0].name ? homework.attachmentIds[0].name : '',
                     pdfUrl: `${homework.attachmentIds[0].baseUrl}${homework.attachmentIds[0].key}`
                 };
                 extractedData.push(extractedItem);
@@ -215,9 +216,9 @@ async function dppQuestions(token, batchNameSlug, subjectSlug, chapterSlug, retr
         data.data.forEach(item => {
             item.homeworkIds.forEach(homework => {
                 const extractedItem = {
-                    topic: homework.topic,
-                    note: homework.note,
-                    pdfName: homework.attachmentIds[0].name,
+                    topic: homework.topic ? homework.topic : '',
+                    note: homework.note ? homework.note : '',
+                    pdfName: homework.attachmentIds[0].name ? homework.attachmentIds[0].name : '',
                     pdfUrl: `${homework.attachmentIds[0].baseUrl}${homework.attachmentIds[0].key}`
                 };
                 extractedData.push(extractedItem);
@@ -259,11 +260,11 @@ async function dppVideos(token, batchNameSlug, subjectSlug, chapterSlug, retryCo
                 topic: item.topic,
                 date: item.date,
                 videoDetails: {
-                    name: item.videoDetails.name,
-                    image: item.videoDetails.image,
+                    name: item.videoDetails.name ? item.videoDetails.name : '',
+                    image: item.videoDetails.image ? item.videoDetails.image : '',
                     videoUrl: item.videoDetails.videoUrl ? item.videoDetails.videoUrl : '',
                     embedCode: item.videoDetails.embedCode ? item.videoDetails.embedCode : '',
-                    duration: item.videoDetails.duration
+                    duration: item.videoDetails.duration ? item.videoDetails.duration : ''
                 }
             };
             extractedData.push(extractedItem);
