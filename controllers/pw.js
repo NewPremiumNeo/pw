@@ -137,7 +137,6 @@ async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page 
                     duration: item.videoDetails.duration ? item.videoDetails.duration : ''
                 }
             };
-            console.log("tem ",extractedItem)
             extractedData.push(extractedItem);
         });
         const extractedJson = {
