@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 import { paidBatches, freeBatches, specificeBatch, subjectListDetails, videosBatch, videoNotes, dppQuestions, dppVideos } from '../controllers/pw.js';
 // Your main file
-import findKey from '../controllers/keyFinder.js';
+import {findKey, findKey2} from '../controllers/keyFinder.js';
 import authLogin from '../middlewares/auth.js';
 import { saveDataToMongoDB, saveAllDataToMongoDB } from '../controllers/saveBatch.js';
 // import saveDataToMongoDB from '../controllers/new.js';
@@ -21,7 +21,7 @@ router.get('/login', function (req, res, next) {
 
 router.post('/login', async function (req, res, next) {
   const token = req.body.token;
-  if(!token) res.send("<script>alert('Please Enter Token'); window.location.href='/login';</script>");
+  if (!token) res.send("<script>alert('Please Enter Token'); window.location.href='/login';</script>");
   const url = 'https://api.penpencil.co/v3/oauth/verify-token';
   const headers = {
     'Authorization': `Bearer ${token}`,
@@ -119,12 +119,26 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:
 router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;
   try {
-    const key = await findKey(videoUrl)
-    res.render('player', { videoUrl, key });
+    const key = await findKey2(videoUrl)
+    // const key = await findKey(videoUrl)
+    if (key) {
+      res.render('player', { videoUrl, key });
+    } else {
+      res.status(400).send("Decrypting video crash");
+    }
   } catch (error) {
-    res.send("Server Error: ", error.message)
+    res.status(403).send("Server Error: " + error.message); 
   }
 });
+
+
+// router.get('/lol', async function (req, res, next) {
+//   try {
+//     res.render('lol');
+//   } catch (error) {
+//     res.send("Server Error: ", error.message)
+//   }
+// });
 
 
 router.get('/saved/Batches', async function (req, res, next) {

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import dotenv from 'dotenv';
+import cors from 'cors';
 dotenv.config();
 
 import indexRouter from './routes/index.js';
@@ -40,6 +41,7 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
+app.use(cors());
 const port = process.env.PORT || 3000
 
 const server = app.listen(port, () => {

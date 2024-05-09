@@ -148,14 +148,14 @@
         <div class="circle"></div>
     </div>
     <video controls crossorigin playsinline id="videoContainer" style="background-color: #0A0909;">
-        <source src="<%= videoUrl %>">
+        <!-- <source src="https://d1d34p8vz63oiq.cloudfront.net/4768b598-7e30-4c2e-bff9-ab6c6337cc44/master.mpd"> -->
     </video>
 
 
-    <script>
+    <!-- <script>
         const video = document.getElementById("videoContainer");
         document.addEventListener("DOMContentLoaded", function () {
-            const source = "<%= videoUrl %>";
+            const source = "https://d1d34p8vz63oiq.cloudfront.net/4768b598-7e30-4c2e-bff9-ab6c6337cc44/master.mpd";
             const dash = dashjs.MediaPlayer().create();
             var defaultOptions = {
                 controls: ['rewind', 'play', 'fast-forward', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen', 'keyboard'],
@@ -190,7 +190,7 @@
             const protData = {
                 "org.w3.clearkey": {
                     "clearkeys": {
-                        "<%= key.kid %>": "<%= key.k %>"
+                        "w9TpIOHhmHQ7ZNWI_jJMXw": "UMGX9qEhZMtKFKtWlBfKgQ"
                     }
                 }
             };
@@ -215,7 +215,7 @@
                 };
                 defaultOptions.previewThumbnails = {
                     enabled: true,
-                    src: '<%= videoUrl %>'
+                    src: 'https://d1d34p8vz63oiq.cloudfront.net/4768b598-7e30-4c2e-bff9-ab6c6337cc44/master.mpd'
                 };
                 defaultOptions.tooltips = { controls: true, seek: true };
                 const player = new Plyr(video, defaultOptions);
@@ -224,9 +224,114 @@
             });
             dash.attachView(video);
         });
+    </script> -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const video = document.querySelector("video");
+            const controls = [
+                "rewind",
+                "play",
+                "fast-forward",
+                "progress",
+                "current-time",
+                "settings",
+                "fullscreen",
+                'pip',
+                'airplay',
+                "keyboard",
+            ];
+            //   https://studyrays.site/player/file.php?vid=7029ce65-7e30-49de-bdc8-524f7d3454ac&quality=240&ex=.m3u8
+            const sources = {
+                240: "https://studyrays.site/player/file.php?vid=7029ce65-7e30-49de-bdc8-524f7d3454ac&quality=240&ex=.m3u8",
+                360: "https://studyrays.site/player/file.php?vid=7029ce65-7e30-49de-bdc8-524f7d3454ac&quality=360&ex=.m3u8",
+                480: "https://studyrays.site/player/file.php?vid=7029ce65-7e30-49de-bdc8-524f7d3454ac&quality=480&ex=.m3u8",
+                720: "https://studyrays.site/player/file.php?vid=7029ce65-7e30-49de-bdc8-524f7d3454ac&quality=720&ex=.m3u8",
+            };
+
+            const player = new Plyr(video, {
+                controls: controls,
+                settings: ["quality", "speed"],
+                autoplay: true,
+                speed: {
+                    selected: 1,
+                    options: [
+                        0.5, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3
+                    ],
+                },
+                quality: {
+                    default: "240",
+                    options: ["240", "360", "480", "720"],
+                    forced: true,
+                    onChange: (newQuality) => {
+                        const sourceUrl = sources[newQuality];
+                        if (Hls.isSupported()) {
+                            const hls = new Hls();
+                            hls.loadSource(sourceUrl);
+                            hls.attachMedia(video);
+                        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+                            video.src = sourceUrl;
+                        }
+                    },
+                },
+            });
+
+            // Expose player so it can be used from the console
+            window.player = player;
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Listen for the full-screen change event
+            document.addEventListener('fullscreenchange', () => {
+                if (document.fullscreenElement) {
+                    // Entered full-screen mode, try to lock the screen orientation
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(error => {
+                            console.error('Error locking screen orientation:', error);
+                        });
+                    }
+                } else {
+                    // Exited full-screen mode, try to unlock the screen orientation
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock().catch(error => {
+                            console.error('Error unlocking screen orientation:', error);
+                        });
+                    }
+                }
+            });
+        });
     </script>
+
 
 
 </body>
 
 </html>
+
+
+<!-- <?php
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET');
+    header("Access-Control-Allow-Headers: X-Requested-With");
+
+    if (isset($_GET["url"])) {
+        $url = $_GET["url"];
+        if (filter_var($url, FILTER_VALIDATE_URL)) {
+            echo file_get_contents($url);
+        } else {
+            http_response_code(500);
+            header('Content-Type: application/json; charset=utf-8');
+            $error = array(
+                "error" => "invalid url"
+            );
+            die (json_encode($error));    
+        }
+    } else {
+        http_response_code(404);
+        header('Content-Type: application/json; charset=utf-8');
+        $error = array(
+            "error" => "please specify an url"
+        );
+        die (json_encode($error));
+    } -->
