@@ -132,15 +132,6 @@ router.get('/play', async function (req, res, next) {
 });
 
 
-// router.get('/lol', async function (req, res, next) {
-//   try {
-//     res.render('lol');
-//   } catch (error) {
-//     res.send("Server Error: ", error.message)
-//   }
-// });
-
-
 router.get('/saved/Batches', async function (req, res, next) {
   const batch = await Batch.find().select('-subjects');
   res.render('savedBatch', { batch });
