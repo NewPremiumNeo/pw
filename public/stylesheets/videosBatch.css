@@ -84,6 +84,9 @@ header a i{
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
+#content{
+    padding: 2rem;
+}
 
 .container {
     display: flex;

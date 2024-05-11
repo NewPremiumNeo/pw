@@ -37,7 +37,7 @@ header a i{
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
-    padding: 0 1%;
+    padding: 2rem;
 }
 
 .mat-card {

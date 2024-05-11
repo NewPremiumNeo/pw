@@ -30,6 +30,7 @@ header a i{
     gap: 20px;
     justify-content: center;
     flex-wrap: wrap;
+    padding: 2rem;
 }
 
 .all-class-card {

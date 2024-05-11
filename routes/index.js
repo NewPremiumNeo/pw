@@ -119,8 +119,8 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:
 router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;
   try {
-    const key = await findKey2(videoUrl)
-    // const key = await findKey(videoUrl)
+    // const key = await findKey2(videoUrl)
+    const key = await findKey(videoUrl)
     if (key) {
       res.render('player', { videoUrl, key });
     } else {
