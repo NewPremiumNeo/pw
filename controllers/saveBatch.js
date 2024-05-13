@@ -96,7 +96,7 @@ async function saveSubjectData(token, batchSlug) {
 
         await batch.save();
         console.log('Subject data saved successfully.');
-        
+
         // Fetch and save chapter data for each subject
         for (const subject of subjectData.data.subjects) {
             await saveChapterData(token, batchSlug, subject.slug, subject.tagCount);
@@ -127,6 +127,9 @@ async function saveChapterData(token, batchSlug, subjectSlug, tagCount) {
                 console.error('Subject not found');
                 return;
             }
+
+            // Clear existing chapters in subject
+            subject.chapters = [];
 
             // Save chapter data under the subject
             for (const chapter of chapterData.data) {
@@ -189,13 +192,7 @@ async function saveVideoData(token, batchSlug, subjectSlug, chapterSlug) {
                 kid: '',
                 k: ''
             }
-            // if(!video.videoDetails.videoUrl.includes("embedCode")){
-            //     const data = await findKey(video.videoDetails.videoUrl)
-            //     key = {
-            //         kid: data.kid,
-            //         k: data.k
-            //     }
-            // }
+
             chapter.videosSch.push({
                 topic: video.topic,
                 date: video.date,
@@ -291,13 +288,7 @@ async function saveDppVideoData(token, batchSlug, subjectSlug, chapterSlug) {
                 kid: '',
                 k: ''
             }
-            // if(!video.videoDetails.videoUrl.includes("embedCode")){
-            //     const data = await findKey(video.videoDetails.videoUrl)
-            //     key = {
-            //         kid: data.kid,
-            //         k: data.k
-            //     }
-            // }
+            
             chapter.dppVideosSch.push({
                 topic: video.topic,
                 date: video.date,
@@ -361,4 +352,4 @@ async function saveDppsData(token, batchSlug, subjectSlug, chapterSlug) {
     }
 }
 
-export { saveDataToMongoDB, saveAllDataToMongoDB };
+export { saveDataToMongoDB, saveAllDataToMongoDB, saveChapterData };

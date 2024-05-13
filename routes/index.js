@@ -4,7 +4,7 @@ import { paidBatches, freeBatches, specificeBatch, subjectListDetails, videosBat
 // Your main file
 import {findKey, findKey2} from '../controllers/keyFinder.js';
 import authLogin from '../middlewares/auth.js';
-import { saveDataToMongoDB, saveAllDataToMongoDB } from '../controllers/saveBatch.js';
+import { saveDataToMongoDB, saveAllDataToMongoDB, saveChapterData } from '../controllers/saveBatch.js';
 // import saveDataToMongoDB from '../controllers/new.js';
 import updateDataToMongoDB from '../controllers/updateBatch.js'
 import { Batch, Subject, Chapter, Video, Note } from '../models/batches.js'
@@ -80,6 +80,12 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/topics', authLogin, asy
   const token = req.cookies.token;
   const subjectListDetailsData = await subjectListDetails(token, req.params.batchNameSlug, req.params.subjectSlug)
   res.render('subjectListDetails', { subjectListDetails: subjectListDetailsData, batchNameSlug: req.params.batchNameSlug, subjectSlug: req.params.subjectSlug });
+});
+
+router.get('/batches/:batchNameSlug/subject/:subjectSlug/topics/save', authLogin, async function (req, res, next) {
+  const token = req.cookies.token;
+  await saveChapterData(token, req.params.batchNameSlug, req.params.subjectSlug, 1)
+  res.status(200).send('Saved');
 });
 
 router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug', authLogin, async function (req, res, next) {

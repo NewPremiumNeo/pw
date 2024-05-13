@@ -104,7 +104,7 @@ async function subjectListDetails(token, batchNameSlug, subjectSlug, page = 1) {
         console.error('Error fetching data:', error.message);
     }
 }
-async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page = 1, retryCount = 3 ) {
+async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page = 1, retryCount = 3) {
     const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=${page}&contentType=videos&tag=${chapterSlug}`;
     const headers = {
         'Authorization': `Bearer ${token}`
@@ -116,9 +116,9 @@ async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page 
             const status = response.status;
             if (status === 429 && retryCount > 0) {
                 console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 // Retry the request
-                return await videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page, retryCount - 1 );
+                return await videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page, retryCount - 1);
             } else {
                 throw new Error(`HTTP error! status: ${status}`);
             }
