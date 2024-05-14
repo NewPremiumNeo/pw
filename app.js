@@ -7,6 +7,7 @@ import logger from 'morgan';
 import dotenv from 'dotenv';
 import cors from 'cors';
 dotenv.config();
+import fetch from 'node-fetch';
 
 import indexRouter from './routes/index.js';
 import './models/connectDB.js'
@@ -41,11 +42,29 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
+async function callURL() {
+  try {
+      const url = "https://pw-pv7y.onrender.com/";
+      const response = await fetch(url);
+      if (response.ok) {
+          console.log("Request sent successfully");
+      } else {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  } catch (error) {
+      console.error("Error:", error.message);
+  }
+}
+
 app.use(cors());
 const port = process.env.PORT || 3000
 
 const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+
+  callURL();
+
+  setInterval(callURL, 60 * 1000);
 });
 
 export default app;
