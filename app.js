@@ -47,7 +47,7 @@ async function callURL() {
       const url = "https://pw-pv7y.onrender.com/";
       const response = await fetch(url);
       if (response.ok) {
-          console.log("Request sent successfully");
+          console.log("Server Refreshed");
       } else {
           throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -64,7 +64,7 @@ const server = app.listen(port, () => {
 
   callURL();
 
-  setInterval(callURL, 60 * 1000);
+  setInterval(callURL, 2 * 60 * 1000);
 });
 
 export default app;
