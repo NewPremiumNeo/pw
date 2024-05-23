@@ -18,22 +18,24 @@
     </h1>
   </header>
   <div class="container">
-    <% paidBatch.data.forEach(course=> { %>
-      <div class="card">
-        <h2>  
-            <% if (course.name.length > 35) { %>
-              <%= course.name.slice(0, 35) + '...' %>
-          <% } else { %>
-              <%= course.name %>
-          <% } %>
-          </h2>
-        <img src="<%= course.previewImage %>" alt="<%= course.name %>">
-        <div>
-        </div>
-        <a href="/batches/<%= course.slug %>/details">Let's Study</a>
-      </div>
-      <% }); %>
-
+    <% if (paidBatch && paidBatch.data && paidBatch.data.length >= 1) { %>
+        <% paidBatch.data.forEach(course=> { %>
+          <div class="card">
+            <h2>  
+                <% if (course.name.length > 35) { %>
+                  <%= course.name.slice(0, 35) + '...' %>
+              <% } else { %>
+                  <%= course.name %>
+              <% } %>
+              </h2>
+            <img src="<%= course.previewImage %>" alt="<%= course.name %>">
+            <div>
+            </div>
+            <a href="/batches/<%= course.slug %>/details">Let's Study</a>
+          </div>
+          <% }); %>
+      <% } %>
+      <% if (freeBatch && freeBatch.data && freeBatch.data.length >= 1) { %>
         <% freeBatch.data.forEach(course=> { %>
           <div class="card">
             <h2>
@@ -45,6 +47,7 @@
             <a href="/batches/<%= course.slug %>/details">Let's Study</a>
           </div>
           <% }); %>
+      <% } %>
 
   </div>
 </body>

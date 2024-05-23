@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 import { paidBatches, freeBatches, specificeBatch, subjectListDetails, videosBatch, videoNotes, dppQuestions, dppVideos } from '../controllers/pw.js';
 // Your main file
-import {findKey, findKey2} from '../controllers/keyFinder.js';
+import { findKey, findKey2 } from '../controllers/keyFinder.js';
 import authLogin from '../middlewares/auth.js';
 import { saveDataToMongoDB, saveAllDataToMongoDB, saveChapterData } from '../controllers/saveBatch.js';
 // import saveDataToMongoDB from '../controllers/new.js';
@@ -13,6 +13,14 @@ import { Batch, Subject, Chapter, Video, Note } from '../models/batches.js'
 /* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Kuch nahi Yrr' });
+});
+
+router.get('/logout', function (req, res, next) {
+  const token = req.cookies.token;
+  if (token) {
+    res.cookie('token', 'logout', { maxAge: 604800000, httpOnly: true });
+  }
+  res.redirect('/login');
 });
 
 router.get('/login', function (req, res, next) {
@@ -126,7 +134,7 @@ router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;
   try {
     let key = await findKey(videoUrl)
-    if(!key){
+    if (!key) {
       key = await findKey2(videoUrl)
     }
     if (key) {
@@ -135,7 +143,7 @@ router.get('/play', async function (req, res, next) {
       res.status(400).send("Decrypting video crash");
     }
   } catch (error) {
-    res.status(403).send("Server Error: " + error.message); 
+    res.status(403).send("Server Error: " + error.message);
   }
 });
 
