@@ -16,7 +16,7 @@ async function paidBatches(token) {
             name: item.name,
             byName: item.byName,
             language: item.language,
-            previewImage: `${item.previewImage.baseUrl}${item.previewImage.key}`,
+            previewImage: `${item.previewImage ? item.previewImage.baseUrl + item.previewImage.key : ''}`,
             slug: item.slug
         }));
         const extractedJson = { data: extractedData };
@@ -42,7 +42,7 @@ async function freeBatches(token) {
             name: item.name,
             byName: item.byName,
             language: item.language,
-            previewImage: `${item.previewImage.baseUrl}${item.previewImage.key}`,
+            previewImage: `${item.previewImage ? item.previewImage.baseUrl + item.previewImage.key : ''}`,
             slug: item.slug
         }));
         const extractedJson = { data: extractedData };
