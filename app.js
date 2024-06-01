@@ -42,6 +42,8 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
+let counter = 0;
+
 async function callURL() {
   try {
       const url = "https://pw-pv7y.onrender.com/";
@@ -63,8 +65,9 @@ const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 
   callURL();
-
-  setInterval(callURL, 2 * 60 * 1000);
+  if(counter<10){
+    setInterval(callURL, 5 * 60 * 1000);
+  }
 });
 
 export default app;
