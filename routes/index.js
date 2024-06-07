@@ -134,13 +134,13 @@ router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;
   try {
     let key = await findKey(videoUrl)
-    if (!key) {
-      key = await findKey2(videoUrl)
-    }
-    if (key) {
+    // if (!key) {
+    //   key = await findKey2(videoUrl)
+    // }
+    if (key && key.kid && key.k) {
       res.render('player', { videoUrl, key });
     } else {
-      res.status(400).send("Decrypting video crash");
+      res.status(400).send("<center><b>Decrypting video failed<br><br>You can download video and watch.<br></b></center>");
     }
   } catch (error) {
     res.status(403).send("Server Error: " + error.message);

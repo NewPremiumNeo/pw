@@ -22,6 +22,7 @@ async function findKey(url) {
 }
 
 async function findKey2(url) {
+    return null;
     console.log("Here ", url)
     url = `https://api-sarkari.koyeb.app/pw?link=${url}`;
     const response = await fetch(url, {
@@ -41,7 +42,7 @@ async function findKey2(url) {
         const transformedClearkeys = Object.entries(clearkeys).reduce((acc, [kid, k]) => {
             acc.push({ "kid": kid, "k": k });
             return acc;
-          }, []);
+        }, []);
         console.log('Found Keys: ', transformedClearkeys);
         return transformedClearkeys[0];
     } else {

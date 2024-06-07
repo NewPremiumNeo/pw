@@ -18,7 +18,8 @@ function downloadPdf(url, filename) {
 }
 
 function copyDownloadLink(videoId, event) {
-    const dashboardLink = `https://api.alphastudyofficial.live/v2/alpha/pw/download?v=https://penpencilvod.pc.cdn.bitgravity.com/${videoId}/master.mpd`;
+    const dashboardLink = `https://pw.jarviis.workers.dev?v=${videoId}&quality=720`;
+    // const dashboardLink = `https://api.alphastudyofficial.live/v2/alpha/pw/download?v=https://penpencilvod.pc.cdn.bitgravity.com/${videoId}/master.mpd`;
     // const dashboardLink = `https://psitoffers.store/1dm.php?vid=${videoId}`;
     const tempInput = document.createElement('input');
     tempInput.value = dashboardLink;
@@ -32,7 +33,7 @@ function copyDownloadLink(videoId, event) {
 
 function extractVideoId(link) {
     const parts = link.split('/');
-    const code = parts[parts.length - 2]; 
+    const code = parts[parts.length - 2];
     return code;
 }
 
