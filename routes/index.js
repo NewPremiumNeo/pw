@@ -130,6 +130,9 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:
   return res.render('videosBatch', { videosBatch: videosBatchData });
 });
 
+router.get('/lol', async function (req, res, next) {
+  res.render('lol');
+})
 router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;
   try {
@@ -140,7 +143,8 @@ router.get('/play', async function (req, res, next) {
     if (key && key.kid && key.k) {
       res.render('player', { videoUrl, key });
     } else {
-      res.status(400).send("<center><b>Decrypting video failed<br><br>You can download video and watch.<br></b></center>");
+      res.render('player2', { videoUrl })
+      // res.status(400).send("<center><b>Decrypting video failed<br><br>You can download video and watch.<br></b></center>");
     }
   } catch (error) {
     res.status(403).send("Server Error: " + error.message);
