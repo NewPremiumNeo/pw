@@ -10,14 +10,16 @@ async function findKey(url) {
         });
         if (!response.ok) {
             console.error(`HTTP error! status: ${response.status}`);
-            throw error;
+            return null;
+            // throw error;
         }
 
         const data = await response.json();
         return data;
     } catch (error) {
         console.error(`Error: ${error.message}`);
-        throw error;
+        return null;
+        // throw error;
     }
 }
 

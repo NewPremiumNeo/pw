@@ -8,6 +8,7 @@ import { saveDataToMongoDB, saveAllDataToMongoDB, saveChapterData } from '../con
 // import saveDataToMongoDB from '../controllers/new.js';
 import updateDataToMongoDB from '../controllers/updateBatch.js'
 import { Batch, Subject, Chapter, Video, Note } from '../models/batches.js'
+import { convertMPDToHLS } from '../controllers/hls.js'
 
 
 /* GET home page. */
@@ -133,10 +134,25 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:
 router.get('/lol', async function (req, res, next) {
   res.render('lol');
 })
+
+router.get('/hls', async function (req, res, next) {
+  try{
+    const vidID = req.query.v;
+    const quality = req.query.quality;
+    console.log(vidID, quality)
+    const data = await convertMPDToHLS(vidID, quality)
+    res.send(data);
+
+  }catch(error){
+    res.status(403).send("HLS Error: " + error.message);
+  }
+})
+
 router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;
   try {
-    let key = await findKey(videoUrl)
+    // let key = await findKey(videoUrl)
+    let key = null;
     // if (!key) {
     //   key = await findKey2(videoUrl)
     // }
