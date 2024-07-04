@@ -83,4 +83,51 @@ const convertMPDToHLS = async (mpdId, quality) => {
     }
 };
 
-export { convertMPDToHLS };
+const multiQualityHLS = async (mpdId) => {
+    try {
+        let mpdUrl = `https://d1d34p8vz63oiq.cloudfront.net/${mpdId}/master.mpd`;
+
+        // Fetch the MPD file
+        const response = await fetch(mpdUrl);
+        const xmlText = await response.text();
+        
+        // Parse the MPD XML
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+
+        // Get AdaptationSet and Representation elements
+        const adaptationSets = xmlDoc.getElementsByTagName("AdaptationSet");
+        
+        let hlsPlaylist = "#EXTM3U\n";
+        hlsPlaylist += "#EXT-X-VERSION:3\n";
+        
+
+        for (let i = 0; i < adaptationSets.length; i++) {
+            const adaptationSet = adaptationSets[i];
+            const representations = adaptationSet.getElementsByTagName("Representation");
+            
+            for (let j = 0; j < representations.length; j++) {
+                const representation = representations[j];
+                const width = representation.getAttribute("width");
+                const height = representation.getAttribute("height");
+                const bandwidth = representation.getAttribute("bandwidth");
+
+                // Determine quality base URL
+                const quality = height;
+                if(!quality) continue;
+
+                hlsPlaylist += `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},RESOLUTION=${width}x${height}\n`;
+                hlsPlaylist += `https://pw-pv7y.onrender.com/hls?v=${mpdId}&quality=${quality}\n\n`;
+                
+            }
+        }
+        return hlsPlaylist;
+
+
+    } catch (error) {
+        console.error("Error converting MPD to HLS:", error);
+    }
+
+}
+
+export { convertMPDToHLS, multiQualityHLS };

@@ -8,7 +8,7 @@ import { saveDataToMongoDB, saveAllDataToMongoDB, saveChapterData } from '../con
 // import saveDataToMongoDB from '../controllers/new.js';
 import updateDataToMongoDB from '../controllers/updateBatch.js'
 import { Batch, Subject, Chapter, Video, Note } from '../models/batches.js'
-import { convertMPDToHLS } from '../controllers/hls.js'
+import { convertMPDToHLS, multiQualityHLS } from '../controllers/hls.js'
 
 
 /* GET home page. */
@@ -131,9 +131,9 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:
   return res.render('videosBatch', { videosBatch: videosBatchData });
 });
 
-router.get('/lol', async function (req, res, next) {
-  res.render('lol');
-})
+// router.get('/lol', async function (req, res, next) {
+//   res.render('lol');
+// })
 
 router.get('/hls', async function (req, res, next) {
   try{
@@ -143,6 +143,16 @@ router.get('/hls', async function (req, res, next) {
     const data = await convertMPDToHLS(vidID, quality)
     res.send(data);
 
+  }catch(error){
+    res.status(403).send("HLS Error: " + error.message);
+  }
+})
+
+router.get('/download/:vidID/master.m3u8', async function (req, res, next) {
+  try{
+    const vidID = req.params.vidID;
+    const data = await multiQualityHLS(vidID);
+    res.send(data);
   }catch(error){
     res.status(403).send("HLS Error: " + error.message);
   }
