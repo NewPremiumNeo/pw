@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdn.plyr.io/3.6.12/plyr.css" />
     <link href="https://fonts.googleapis.com/css?family=Poppins|Quattrocento+Sans" rel="stylesheet" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <title>PKV VIDEO PLAYER 3 (Updated)</title>
+    <title>PKV VIDEO PLAYER 3</title>
     <style>
         html {
             font-family: Poppins;
@@ -152,31 +152,30 @@
         <div class="circle"></div>
         <div class="circle"></div>
     </div>
-
     <% if (videoUrl) { %>
         <% const parts=videoUrl.split('/'); const
             videoId=parts[parts.length - 2]; %>
-
-
     <div class="plyr__video-embed" id="player" style="margin: auto;">
         <video controls crossorigin playsinline id="videoContainer" style="background-color: #0A0909;">
             <source id="masterSource" src="https://pw-pv7y.onrender.com/download/<%= videoId %>/master.m3u8" type="application/x-mpegURL">
         </video>
     </div>
     <% } %>
+
     <script src="https://cdn.plyr.io/3.6.12/plyr.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const video = document.getElementById("videoContainer");
             const loadingElement = document.getElementById("loading");
+            let hls = new Hls();
 
             const defaultOptions = {
                 controls: ['rewind', 'play', 'fast-forward', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen', 'keyboard'],
                 autoplay: false,
                 muted: false,
                 loop: { active: false },
-                speed: { selected: 1, options: [1, 1.25, 1.5, 2, 2.5, 3, 3.25, 3.5, 4] },
+                speed: { selected: 1, options: [1, 1.25, 1.5, 2, 2.5, 2.75, 3, 3.25, 3.5, 4] },
                 captions: { active: true, update: true },
                 tooltips: { controls: true, seek: true },
                 quality: {
@@ -184,31 +183,45 @@
                     options: [720, 480, 360, 240],
                     forced: true,
                     onChange: (newQuality) => {
-                        loadVideo(newQuality);
+                        switchQuality(newQuality);
                     }
                 }
             };
 
-            const loadVideo = (quality) => {
-                const parts='<%= videoUrl %>'.split('/'); 
-                const videoId=parts[parts.length - 2];
-                const hls = new Hls();
-                hls.loadSource(`https://pw-pv7y.onrender.com/download/${videoId}/master.m3u8`);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function () {
-                    loadingElement.style.display = "none";
-                    video.play();
-                });
+            const switchQuality = (quality) => {
+                if (hls.levels) {
+                    hls.nextLevel = hls.levels.findIndex(level => level.height === quality);
+                }
+            };
+            const parts='<%= videoUrl %>'.split('/'); 
+            const videoId=parts[parts.length - 2];
 
-                hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
-                    const availableQualities = hls.levels.map(l => l.height);
-                    defaultOptions.quality.options = availableQualities;
-                    const player = new Plyr(video, defaultOptions);
-                    window.player = player;
-                });
-            }
+            hls.loadSource(`https://pw-pv7y.onrender.com/download/${videoId}/master.m3u8`);
+            hls.attachMedia(video);
 
-            loadVideo(720);
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                loadingElement.style.display = "none";
+                video.play();
+                const player = new Plyr(video, defaultOptions);
+                window.player = player;
+
+                hls.on(Hls.Events.LEVEL_SWITCHED, function(event, data) {
+                    const level = hls.levels[data.level];
+                    if (level) {
+                        const height = level.height;
+                        defaultOptions.quality.options = hls.levels.map(l => l.height);
+                        player.config.quality.options = defaultOptions.quality.options;
+                        player.config.quality.default = height;
+                    }
+                });
+            });
+
+            hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
+                const availableQualities = hls.levels.map(l => l.height);
+                defaultOptions.quality.options = availableQualities;
+                const player = new Plyr(video, defaultOptions);
+                window.player = player;
+            });
         });
     </script>
 </body>
