@@ -177,7 +177,7 @@ router.get('/play', async function (req, res, next) {
     if (key && key.kid && key.k) {
       res.render('player', { videoUrl, key });
     } else {
-      res.render('player2', { videoUrl })
+      res.render('player3', { videoUrl })
       // res.status(400).send("<center><b>Decrypting video failed<br><br>You can download video and watch.<br></b></center>");
     }
   } catch (error) {

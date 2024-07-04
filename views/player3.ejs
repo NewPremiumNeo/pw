@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
@@ -6,14 +7,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="icon" type="image/jpeg" href="https://i.imgur.com/Z52wJgg.jpg">
     <link rel="stylesheet" href="https://cdn.plyr.io/3.6.12/plyr.css" />
-    <!-- Favicon -->
-    <script "text/javascript" src="https://cdn.plyr.io/3.6.12/plyr.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Poppins|Quattrocento+Sans" rel="stylesheet" />
-    <script "text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dashjs/3.1.3/dash.all.min.js"></script>
-    <script "text/javascript" src="https://cdn.jsdelivr.net/npm/hls.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <title>33 PKV VIDEO PLAYER</title>
-    <style type="text/css" media="screen">
+    <title>PKV VIDEO PLAYER 3 (Updated)</title>
+    <style>
         html {
             font-family: Poppins;
             background: #0A0909;
@@ -86,7 +83,6 @@
             opacity: 1;
         }
 
-
         .loading {
             position: fixed;
             top: 0;
@@ -138,6 +134,15 @@
                 opacity: 0;
             }
         }
+
+        #player.plyr__video-embed {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+        }
     </style>
 </head>
 
@@ -147,88 +152,65 @@
         <div class="circle"></div>
         <div class="circle"></div>
     </div>
+
     <% if (videoUrl) { %>
-     
-    
         <% const parts=videoUrl.split('/'); const
-                videoId=parts[parts.length - 2]; %>
-                
+            videoId=parts[parts.length - 2]; %>
+
+
+    <div class="plyr__video-embed" id="player" style="margin: auto;">
         <video controls crossorigin playsinline id="videoContainer" style="background-color: #0A0909;">
-            <source src="http://localhost:3000/hls/<%= videoId %>/master.m3u8">
+            <source id="masterSource" src="https://pw-pv7y.onrender.com/download/<%= videoId %>/master.m3u8" type="application/x-mpegURL">
         </video>
-
+    </div>
     <% } %>
-
-
+    <script src="https://cdn.plyr.io/3.6.12/plyr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
-
-        const parts= '<%= videoUrl %>'.split('/'); 
-        const videoId=parts[parts.length - 2];
-        const video = document.getElementById("videoContainer");
         document.addEventListener("DOMContentLoaded", function () {
-            const source = `http://localhost:3000/hls/${videoId}/master.m3u8`;
-            const dash = dashjs.MediaPlayer().create();
-            var defaultOptions = {
+            const video = document.getElementById("videoContainer");
+            const loadingElement = document.getElementById("loading");
+
+            const defaultOptions = {
                 controls: ['rewind', 'play', 'fast-forward', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen', 'keyboard'],
-                "autoplay": false,
-                "muted": false,
-                "loop": {
-                    "active": false
-                },
-                speed: {
-                    selected: 1,
-                    options: [1, 1.25, 1.5, 2, 2.5, 3, 3.25, 3.5, 4]
-                },
-                "captions": {
-                    "active": true,
-                    "update": true
+                autoplay: false,
+                muted: false,
+                loop: { active: false },
+                speed: { selected: 1, options: [1, 1.25, 1.5, 2, 2.5, 3, 3.25, 3.5, 4] },
+                captions: { active: true, update: true },
+                tooltips: { controls: true, seek: true },
+                quality: {
+                    default: 720,
+                    options: [720, 480, 360, 240],
+                    forced: true,
+                    onChange: (newQuality) => {
+                        loadVideo(newQuality);
+                    }
                 }
             };
-            dash.initialize(video, source, false);
-            dash.updateSettings({
-                streaming: {
-                    abr: {
-                        autoSwitchBitrate: {
-                            audio: false,
-                            video: false
-                        }
-                    },
-                    fastSwitchEnabled: true,
-                    lowLatencyEnabled: true
-                }
-            });
-            dash.on("streamInitialized", function () {
-                const bodyElement = document.querySelector("body");
-                const loadingElement = document.getElementById("loading");
-                loadingElement.style.display = "none";
-                bodyElement.style.visibility = "visible";
-                const availableQualities = dash.getBitrateInfoListFor("video").map((l) => l.height);
-                defaultOptions.quality = {
-                    default: availableQualities[0].height,
-                    options: availableQualities,
-                    forced: true,
-                    onChange: function (newQuality) {
-                        dash.getBitrateInfoListFor("video").forEach((level, levelIndex) => {
-                            if (level.height === newQuality) {
-                                dash.setQualityFor("video", level.qualityIndex);
-                            }
-                        });
-                    },
-                };
-                defaultOptions.previewThumbnails = {
-                    enabled: true,
-                    src: `http://localhost:3000/hls/${videoId}/master.m3u8`
-                };
-                defaultOptions.tooltips = { controls: true, seek: true };
-                const player = new Plyr(video, defaultOptions);
-                window.player = player;
-                window.dash = dash; 
-            });
-            dash.attachView(video);
+
+            const loadVideo = (quality) => {
+                const parts='<%= videoUrl %>'.split('/'); 
+                const videoId=parts[parts.length - 2];
+                const hls = new Hls();
+                hls.loadSource(`https://pw-pv7y.onrender.com/download/${videoId}/master.m3u8`);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                    loadingElement.style.display = "none";
+                    video.play();
+                });
+
+                hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
+                    const availableQualities = hls.levels.map(l => l.height);
+                    defaultOptions.quality.options = availableQualities;
+                    const player = new Plyr(video, defaultOptions);
+                    window.player = player;
+                });
+            }
+
+            loadVideo(720);
         });
     </script>
-
-
 </body>
 
 </html>
