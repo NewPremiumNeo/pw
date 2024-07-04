@@ -136,27 +136,35 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:
 // })
 
 router.get('/hls', async function (req, res, next) {
-  try{
+  try {
     const vidID = req.query.v;
     const quality = req.query.quality;
     console.log(vidID, quality)
     const data = await convertMPDToHLS(vidID, quality)
+    res.setHeader('Content-Type', 'application/x-mpegurl; charset=utf-8');
     res.send(data);
 
-  }catch(error){
+  } catch (error) {
     res.status(403).send("HLS Error: " + error.message);
   }
 })
 
 router.get('/download/:vidID/master.m3u8', async function (req, res, next) {
-  try{
+  try {
     const vidID = req.params.vidID;
     const data = await multiQualityHLS(vidID);
+
+    // Set the required headers
+    res.setHeader('Content-Type', 'application/x-mpegurl; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="PKV_play.m3u8"');
+
+    // Send the response
     res.send(data);
-  }catch(error){
+  } catch (error) {
     res.status(403).send("HLS Error: " + error.message);
   }
-})
+});
+
 
 router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;

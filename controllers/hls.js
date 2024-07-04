@@ -117,7 +117,7 @@ const multiQualityHLS = async (mpdId) => {
                 if(!quality) continue;
 
                 hlsPlaylist += `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},RESOLUTION=${width}x${height}\n`;
-                hlsPlaylist += `https://pw-pv7y.onrender.com/hls?v=${mpdId}&quality=${quality}\n\n`;
+                hlsPlaylist += `https://pw-pv7y.onrender.com/hls?v=${mpdId}&quality=${quality}\n`;
                 
             }
         }
