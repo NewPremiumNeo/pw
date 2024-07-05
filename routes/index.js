@@ -167,29 +167,27 @@ router.get('/download/:vidID/master.m3u8', async function (req, res, next) {
 
 router.get('/key', async (req, res) => {
   const mpdId = req.query.id;
-
-  // Validate query parameter
   if (!mpdId) {
     return res.status(400).send('Bad Request: Missing id query parameter');
   }
-  
 
-  // const targetUrl1 = `https://dl.pwjarvis.com/api/get-hls-key?id=${mpdId}`;
-  // try {
-  //   const response1 = await fetch(targetUrl1);
-  //   if (!response1.ok) {
-  //     throw new Error('Failed to fetch from targetUrl1');
-  //   }
-  //   const body1 = await response1.text();
-  //   console.log(body1)
-  //   res.set('Content-Type', response1.headers.get('content-type'));
-  //   return res.send(body1);
-  // } catch (error) {
-  //   console.error('Error fetching the first target URL:', error);
-  // }
+  // const targetUrl1 = `https://dl.pwjarvis.com/api/get-hls-key?id=53ca8fe2-6559-46dc-b3fb-fa23a3b5c716`;
+  const targetUrl1 = `https://dl.pwjarvis.com/api/get-hls-key?id=${mpdId}`;
+  try {
+    const response1 = await fetch(targetUrl1);
+    if (!response1.ok) {
+      throw new Error('Failed to fetch from targetUrl1');
+    }
+    const body1 = await response1.text();
+    res.set('Content-Type', response1.headers.get('content-type'));
+    return res.send(body1);
+  } catch (error) {
+    console.error('Error fetching the first target URL:', error);
+  }
 
-  const targetUrl2 = `https://ratna-app-video-tnyn3.ondigitalocean.app/ratna_play?url=https://d1d34p8vz63oiq.cloudfront.net/${mpdId}/master.m3u8`;
-  console.log(targetUrl2  )
+  // const targetUrl2 = `https://api.penpencil.co/v1/videos/get-hls-key?videoKey=${mpdId}&key=enc.key`;
+
+  const targetUrl2 = `https://ratna-app-video-tnyn3.ondigitalocean.app/fetch?videoKey=${mpdId}&key=enc.key`;
   try {
     const response2 = await fetch(targetUrl2, {
       headers: {
@@ -197,16 +195,14 @@ router.get('/key', async (req, res) => {
       }
     });
     if (!response2.ok) {
-      console.log("errrrrrrrrrrr")
       throw new Error('Failed to fetch from targetUrl2');
     }
     const body2 = await response2.text();
-    console.log(body2)
     res.set('Content-Type', response2.headers.get('content-type'));
     return res.send(body2);
   } catch (error) {
     console.error('Error fetching the second target URL:', error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send('Nothing Fetched');
   }
 });
 
