@@ -180,7 +180,7 @@ router.get('/key', async (req, res) => {
     }
     const body1 = await response1.text();
     res.set('Content-Type', response1.headers.get('content-type'));
-    return res.send(body1);
+    return res.send(response1);
   } catch (error) {
     console.error('Error fetching the first target URL:', error);
   }
