@@ -57,7 +57,7 @@ const convertMPDToHLS = async (mpdId, quality) => {
         hlsPlaylist += "#EXT-X-PLAYLIST-TYPE:VOD\n";
 
         // Add key (optional, modify as needed)
-        hlsPlaylist += `#EXT-X-KEY:METHOD=AES-128,URI="https://dl.pwjarvis.com/api/get-hls-key?id=${mpdId}",IV=0x00000000000000000000000000000000\n`;
+        hlsPlaylist += `#EXT-X-KEY:METHOD=AES-128,URI="https://pw-pv7y.onrender.com/key?id=${mpdId}",IV=0x00000000000000000000000000000000\n`;
 
         // Add media segments
         let segmentNumber = parseInt(segmentTemplate.getAttribute("startNumber")) - 1;

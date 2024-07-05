@@ -165,6 +165,46 @@ router.get('/download/:vidID/master.m3u8', async function (req, res, next) {
   }
 });
 
+router.get('/key', async (req, res) => {
+  const mpdId = req.query.id;
+
+  // Validate query parameter
+  if (!mpdId) {
+    return res.status(400).send('Bad Request: Missing id query parameter');
+  }
+
+  const targetUrl1 = `https://dl.pwjarvis.com/api/get-hls-key?id=${mpdId}`;
+  try {
+    const response1 = await fetch(targetUrl1);
+    if (!response1.ok) {
+      throw new Error('Failed to fetch from targetUrl1');
+    }
+    const body1 = await response1.buffer();
+    res.set('Content-Type', response1.headers.get('content-type'));
+    return res.send(body1);
+  } catch (error) {
+    console.error('Error fetching the first target URL:', error);
+  }
+
+  const targetUrl2 = `https://ratna-app-video-tnyn3.ondigitalocean.app/ratna_play?url=https://d1d34p8vz63oiq.cloudfront.net/${mpdId}/master.m3u8`;
+  try {
+    const response2 = await fetch(targetUrl2, {
+      headers: {
+        'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 9; SM-N960N Build/PQ3A.190705.06121522)'
+      }
+    });
+    if (!response2.ok) {
+      throw new Error('Failed to fetch from targetUrl2');
+    }
+    const body2 = await response2.buffer();
+    res.set('Content-Type', response2.headers.get('content-type'));
+    return res.send(body2);
+  } catch (error) {
+    console.error('Error fetching the second target URL:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;
