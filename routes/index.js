@@ -172,21 +172,24 @@ router.get('/key', async (req, res) => {
   if (!mpdId) {
     return res.status(400).send('Bad Request: Missing id query parameter');
   }
+  
 
-  const targetUrl1 = `https://dl.pwjarvis.com/api/get-hls-key?id=${mpdId}`;
-  try {
-    const response1 = await fetch(targetUrl1);
-    if (!response1.ok) {
-      throw new Error('Failed to fetch from targetUrl1');
-    }
-    const body1 = await response1.buffer();
-    res.set('Content-Type', response1.headers.get('content-type'));
-    return res.send(body1);
-  } catch (error) {
-    console.error('Error fetching the first target URL:', error);
-  }
+  // const targetUrl1 = `https://dl.pwjarvis.com/api/get-hls-key?id=${mpdId}`;
+  // try {
+  //   const response1 = await fetch(targetUrl1);
+  //   if (!response1.ok) {
+  //     throw new Error('Failed to fetch from targetUrl1');
+  //   }
+  //   const body1 = await response1.text();
+  //   console.log(body1)
+  //   res.set('Content-Type', response1.headers.get('content-type'));
+  //   return res.send(body1);
+  // } catch (error) {
+  //   console.error('Error fetching the first target URL:', error);
+  // }
 
   const targetUrl2 = `https://ratna-app-video-tnyn3.ondigitalocean.app/ratna_play?url=https://d1d34p8vz63oiq.cloudfront.net/${mpdId}/master.m3u8`;
+  console.log(targetUrl2  )
   try {
     const response2 = await fetch(targetUrl2, {
       headers: {
@@ -194,9 +197,11 @@ router.get('/key', async (req, res) => {
       }
     });
     if (!response2.ok) {
+      console.log("errrrrrrrrrrr")
       throw new Error('Failed to fetch from targetUrl2');
     }
-    const body2 = await response2.buffer();
+    const body2 = await response2.text();
+    console.log(body2)
     res.set('Content-Type', response2.headers.get('content-type'));
     return res.send(body2);
   } catch (error) {
