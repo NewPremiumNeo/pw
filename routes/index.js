@@ -131,9 +131,6 @@ router.get('/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapterSlug/:
   return res.render('videosBatch', { videosBatch: videosBatchData });
 });
 
-// router.get('/lol', async function (req, res, next) {
-//   res.render('lol');
-// })
 
 router.get('/hls', async function (req, res, next) {
   try {
@@ -157,7 +154,7 @@ router.get('/download/:vidID/master.m3u8', async function (req, res, next) {
     // Set the required headers
     res.setHeader('Content-Type', 'application/x-mpegurl; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="PKV_play.m3u8"');
-
+    
     // Send the response
     res.send(data);
   } catch (error) {
@@ -165,61 +162,37 @@ router.get('/download/:vidID/master.m3u8', async function (req, res, next) {
   }
 });
 
-router.get('/key', async (req, res) => {
-  const mpdId = req.query.id;
-  if (!mpdId) {
-    return res.status(400).send('Bad Request: Missing id query parameter');
-  }
-
-  // const targetUrl1 = `https://dl.pwjarvis.com/api/get-hls-key?id=53ca8fe2-6559-46dc-b3fb-fa23a3b5c716`;
-  const targetUrl1 = `https://dl.pwjarvis.com/api/get-hls-key?id=${mpdId}`;
+router.get('/get-hls-key', async (req, res) => {
+  const videoKey = req.query.id;
+  const url = `https://api.penpencil.co/v1/videos/get-hls-key?videoKey=${videoKey}&key=enc.key`;
+  // const url2 = `https://dl.pwjarvis.com/api/get-hls-key?id=${videoKey}`;
+  const headers = {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjE0NDM3MjUuMzY0LCJkYXRhIjp7Il9pZCI6IjY2N2EyNjVmMTg0NDlkMDY3MDgzZmZmYiIsInVzZXJuYW1lIjoiOTIzNTczNjAwNCIsImZpcnN0TmFtZSI6Ik5pdGluIiwibGFzdE5hbWUiOiJHdXB0YSIsIm9yZ2FuaXphdGlvbiI6eyJfaWQiOiI1ZWIzOTNlZTk1ZmFiNzQ2OGE3OWQxODkiLCJ3ZWJzaXRlIjoicGh5c2ljc3dhbGxhaC5jb20iLCJuYW1lIjoiUGh5c2ljc3dhbGxhaCJ9LCJyb2xlcyI6WyI1YjI3YmQ5NjU4NDJmOTUwYTc3OGM2ZWYiLCI1Y2M5NWEyZThiZGU0ZDY2ZGU0MDBiMzciXSwiY291bnRyeUdyb3VwIjoiSU4iLCJ0eXBlIjoiVVNFUiJ9LCJpYXQiOjE3MjA4Mzg5MjV9.UiB2lKO2Tka6lhhnvSmQVPrBl8BAImng5gSsX0fIE0g",
+    "User-Agent": "Mozilla/5.0 (Linux; Android 13; 22031116AI Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/126.0.6478.134 Mobile Safari/537.36"
+  };
+  
   try {
-    const response1 = await fetch(targetUrl1);
-    if (!response1.ok) {
-      throw new Error('Failed to fetch from targetUrl1');
-    }
-    const body1 = await response1.text();
-    res.set('Content-Type', response1.headers.get('content-type'));
-    return res.send(response1);
+    const response = await fetch(url, { headers });
+    const data = await response.text();
+    console.log(data)
+    res.setHeader('Content-Type', 'binary/octet-stream');
+    res.setHeader('Vary', 'RSC, Next-Router-State-Tree, Next-Router-Prefetch, Accept-Encoding');
+    res.send(data);
   } catch (error) {
-    console.error('Error fetching the first target URL:', error);
-  }
-
-  // const targetUrl2 = `https://api.penpencil.co/v1/videos/get-hls-key?videoKey=${mpdId}&key=enc.key`;
-
-  const targetUrl2 = `https://ratna-app-video-tnyn3.ondigitalocean.app/fetch?videoKey=${mpdId}&key=enc.key`;
-  try {
-    const response2 = await fetch(targetUrl2, {
-      headers: {
-        'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 9; SM-N960N Build/PQ3A.190705.06121522)'
-      }
-    });
-    if (!response2.ok) {
-      throw new Error('Failed to fetch from targetUrl2');
-    }
-    const body2 = await response2.text();
-    res.set('Content-Type', response2.headers.get('content-type'));
-    return res.send(body2);
-  } catch (error) {
-    console.error('Error fetching the second target URL:', error);
-    res.status(500).send('Nothing Fetched');
+    console.error('Error:', error);
+    res.status(500).send('An error occurred');
   }
 });
-
 
 router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;
   try {
     // let key = await findKey(videoUrl)
     let key = null;
-    // if (!key) {
-    //   key = await findKey2(videoUrl)
-    // }
     if (key && key.kid && key.k) {
       res.render('player', { videoUrl, key });
     } else {
       res.render('player3', { videoUrl })
-      // res.status(400).send("<center><b>Decrypting video failed<br><br>You can download video and watch.<br></b></center>");
     }
   } catch (error) {
     res.status(403).send("Server Error: " + error.message);
