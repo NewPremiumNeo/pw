@@ -9,8 +9,6 @@ const convertMPDToHLS = async (mpdId, quality) => {
         const access_token = db.access_token;
         const refresh_token = db.refresh_token;
 
-        console.log(access_token, refresh_token)
-
         const verifyToken = async (token) => {
             try {
                 const response = await fetch('https://api.penpencil.co/v3/oauth/verify-token', {
@@ -75,10 +73,28 @@ const convertMPDToHLS = async (mpdId, quality) => {
         let mpdUrl2 = `https://d1bppx4iuv3uee.cloudfront.net/${mpdId}/hls/${quality}/main.m3u8`;
 
         const main_data = await fetch(mpdUrl2);
+
+        const response = await fetch('https://api.penpencil.co/v3/files/send-analytics-data', {
+            method: 'POST',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 24_6 like Mac OS X) AppleWebKit/605.5.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1',
+                'Content-Type': 'application/json',
+                'client-type': 'WEB',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ 'url': `${mpdUrl2}` })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
         const main_data2 = await main_data.text();
         const pattern = /(\d{3,4}\.ts)/g;
-        const replacement = `${mainUrl}/$1`;
-        const newText = main_data2.replace(pattern, replacement).replace("enc.key", `enc.key&authorization=${token}`)
+        const replacement = `${mainUrl}/$1${data.data}`;
+        const newText = main_data2.replace(pattern, replacement).replace("https://api.penpencil.co/v1/videos/", `https://pw-pv7y.onrender.com/`)
 
         return newText;
     } catch (error) {

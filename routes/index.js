@@ -136,7 +136,6 @@ router.get('/hls', async function (req, res, next) {
   try {
     const vidID = req.query.v;
     const quality = req.query.quality;
-    console.log(vidID, quality)
     const data = await convertMPDToHLS(vidID, quality)
     if (!data) { return res.status(403).send("Token Expired Change it!"); }
     res.setHeader('Content-Type', 'application/x-mpegurl; charset=utf-8');
@@ -163,21 +162,22 @@ router.get('/download/:vidID/master.m3u8', async function (req, res, next) {
 });
 
 router.get('/get-hls-key', async (req, res) => {
-  const videoKey = req.query.id;
+  let db = await Token.findOne();
+  const token = db.access_token;
+  const videoKey = req.query.videoKey;
   const url = `https://api.penpencil.co/v1/videos/get-hls-key?videoKey=${videoKey}&key=enc.key&authorization=${token}`;
 
   try {
     const response = await fetch(url);
-    const data = await response.text();
-    console.log(data)
-    res.setHeader('Content-Type', 'binary/octet-stream');
-    res.setHeader('Vary', 'RSC, Next-Router-State-Tree, Next-Router-Prefetch, Accept-Encoding');
-    res.send(data);
+    const data = await response.arrayBuffer();  // Use arrayBuffer() for binary data
+    res.setHeader('Content-Type', 'application/octet-stream');  // Set correct MIME type for binary data
+    res.send(Buffer.from(data));  // Convert ArrayBuffer to Buffer
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('An error occurred');
   }
 });
+
 
 router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;

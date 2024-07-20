@@ -103,7 +103,6 @@ async function subjectListDetails(token, batchNameSlug, subjectSlug, page = 1) {
                 break;
             }
             const data = await response.json();
-            console.log("lalalal ", subjectListDetailsPage)
             if (!(data && data.data && data.data.length >= 1)) {
                 break;
             }
