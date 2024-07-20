@@ -138,7 +138,7 @@ async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page 
                 }
             }
             const data = await response.json();
-            if(!(data && data.data && data.data.length >= 1)){
+            if (!(data && data.data && data.data.length >= 1)) {
                 break;
             }
             data.data.forEach(item => {
@@ -204,6 +204,7 @@ async function videoNotes(token, batchNameSlug, subjectSlug, chapterSlug, retryC
                     extractedData.push(extractedItem);
                 });
             });
+            notesPage++;
         }
 
         const extractedJson = {
