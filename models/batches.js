@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
+const tokenSchema = new Schema({
+    access_token: String,
+    refresh_token: String
+});
+
 // Define subdocument schemas
 const videoSchema = new Schema({
     topic: String,
@@ -87,5 +92,6 @@ const Video = mongoose.model('Video', videoSchema);
 const Note = mongoose.model('Note', noteSchema);
 const DppVideo = mongoose.model('DppVideo', dppVideoSchema);
 const Dpp = mongoose.model('Dpp', dppSchema);
+const Token = mongoose.model('Token', tokenSchema);
 
-export { Batch, Subject, Chapter, Video, Note, DppVideo, Dpp };
+export { Batch, Subject, Chapter, Video, Note, DppVideo, Dpp, Token };

@@ -7,7 +7,7 @@ import authLogin from '../middlewares/auth.js';
 import { saveDataToMongoDB, saveAllDataToMongoDB, saveChapterData } from '../controllers/saveBatch.js';
 // import saveDataToMongoDB from '../controllers/new.js';
 import updateDataToMongoDB from '../controllers/updateBatch.js'
-import { Batch, Subject, Chapter, Video, Note } from '../models/batches.js'
+import { Batch, Subject, Chapter, Video, Note, Token } from '../models/batches.js'
 import { convertMPDToHLS, multiQualityHLS } from '../controllers/hls.js'
 
 
@@ -138,7 +138,9 @@ router.get('/hls', async function (req, res, next) {
     const quality = req.query.quality;
     console.log(vidID, quality)
     const data = await convertMPDToHLS(vidID, quality)
+    if (!data) { return res.status(403).send("Token Expired Change it!"); }
     res.setHeader('Content-Type', 'application/x-mpegurl; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="main.m3u8"');
     res.send(data);
 
   } catch (error) {
@@ -151,11 +153,9 @@ router.get('/download/:vidID/master.m3u8', async function (req, res, next) {
     const vidID = req.params.vidID;
     const data = await multiQualityHLS(vidID);
 
-    // Set the required headers
     res.setHeader('Content-Type', 'application/x-mpegurl; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename="PKV_play.m3u8"');
-    
-    // Send the response
+
     res.send(data);
   } catch (error) {
     res.status(403).send("HLS Error: " + error.message);
@@ -164,15 +164,10 @@ router.get('/download/:vidID/master.m3u8', async function (req, res, next) {
 
 router.get('/get-hls-key', async (req, res) => {
   const videoKey = req.query.id;
-  const url = `https://api.penpencil.co/v1/videos/get-hls-key?videoKey=${videoKey}&key=enc.key`;
-  // const url2 = `https://dl.pwjarvis.com/api/get-hls-key?id=${videoKey}`;
-  const headers = {
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjE0NDM3MjUuMzY0LCJkYXRhIjp7Il9pZCI6IjY2N2EyNjVmMTg0NDlkMDY3MDgzZmZmYiIsInVzZXJuYW1lIjoiOTIzNTczNjAwNCIsImZpcnN0TmFtZSI6Ik5pdGluIiwibGFzdE5hbWUiOiJHdXB0YSIsIm9yZ2FuaXphdGlvbiI6eyJfaWQiOiI1ZWIzOTNlZTk1ZmFiNzQ2OGE3OWQxODkiLCJ3ZWJzaXRlIjoicGh5c2ljc3dhbGxhaC5jb20iLCJuYW1lIjoiUGh5c2ljc3dhbGxhaCJ9LCJyb2xlcyI6WyI1YjI3YmQ5NjU4NDJmOTUwYTc3OGM2ZWYiLCI1Y2M5NWEyZThiZGU0ZDY2ZGU0MDBiMzciXSwiY291bnRyeUdyb3VwIjoiSU4iLCJ0eXBlIjoiVVNFUiJ9LCJpYXQiOjE3MjA4Mzg5MjV9.UiB2lKO2Tka6lhhnvSmQVPrBl8BAImng5gSsX0fIE0g",
-    "User-Agent": "Mozilla/5.0 (Linux; Android 13; 22031116AI Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/126.0.6478.134 Mobile Safari/537.36"
-  };
-  
+  const url = `https://api.penpencil.co/v1/videos/get-hls-key?videoKey=${videoKey}&key=enc.key&authorization=${token}`;
+
   try {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url);
     const data = await response.text();
     console.log(data)
     res.setHeader('Content-Type', 'binary/octet-stream');
@@ -187,7 +182,6 @@ router.get('/get-hls-key', async (req, res) => {
 router.get('/play', async function (req, res, next) {
   let videoUrl = req.query.videoUrl;
   try {
-    // let key = await findKey(videoUrl)
     let key = null;
     if (key && key.kid && key.k) {
       res.render('player', { videoUrl, key });
@@ -230,6 +224,33 @@ router.get('/saved/batches/:batchNameSlug/subject/:subjectSlug/contents/:chapter
   const subjectListDetailsData = batch.subjects.find(sub => sub.slug === req.params.subjectSlug);
   const videosBatchData = subjectListDetailsData.chapters.find(sub => sub.slug === req.params.chapterSlug);
   res.json(videosBatchData)
+});
+
+
+router.get("/token/update", async (req, res) => {
+  res.render('updateToken')
+});
+
+router.post("/token/update", async (req, res) => {
+  const { access_token, refresh_token } = req.body;
+
+  if (!access_token || !refresh_token) {
+    return res.status(400).json({ error: "access_token and refresh_token are required" });
+  }
+
+  try {
+    let token = await Token.findOne();
+    if (token) {
+      token.access_token = access_token;
+      token.refresh_token = refresh_token;
+    } else {
+      token = new Token({ access_token, refresh_token });
+    }
+    await token.save();
+    res.status(200).json({ message: "Token saved/updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while saving/updating the token" });
+  }
 });
 
 

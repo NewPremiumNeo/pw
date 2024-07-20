@@ -87,58 +87,77 @@ async function specificeBatch(token, batchName) {
 }
 
 async function subjectListDetails(token, batchNameSlug, subjectSlug, page = 1) {
-    const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/topics?page=${page}`;
-    const headers = {
-        'Authorization': `Bearer ${token}`
-    };
+    let subjectListDetailsPage = 1;
+    let wholeData = { success: true, data: [] };
 
     try {
-        const response = await fetch(url, { headers });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        while (true) {
+            const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/topics?page=${subjectListDetailsPage}`;
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+
+
+            const response = await fetch(url, { headers });
+            if (!response.ok) {
+                break;
+            }
+            const data = await response.json();
+            console.log("lalalal ", subjectListDetailsPage)
+            if (!(data && data.data && data.data.length >= 1)) {
+                break;
+            }
+            // Handle data as needed
+            wholeData.data = wholeData.data.concat(data.data)
+            subjectListDetailsPage++
         }
-        const data = await response.json();
-        // Handle data as needed
-        return data;
+
+        return wholeData;
     } catch (error) {
         console.error('Error fetching data:', error.message);
     }
 }
 async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page = 1, retryCount = 3) {
-    const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=${page}&contentType=videos&tag=${chapterSlug}`;
-    const headers = {
-        'Authorization': `Bearer ${token}`
-    };
-
+    let videosBatchPage = 1;
+    const extractedData = [];
     try {
-        const response = await fetch(url, { headers });
-        if (!response.ok) {
-            const status = response.status;
-            if (status === 429 && retryCount > 0) {
-                console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                // Retry the request
-                return await videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page, retryCount - 1);
-            } else {
-                throw new Error(`HTTP error! status: ${status}`);
-            }
-        }
-        const data = await response.json();
-        const extractedData = [];
-        data.data.forEach(item => {
-            const extractedItem = {
-                topic: item.topic,
-                date: item.date,
-                videoDetails: {
-                    name: item.videoDetails.name ? item.videoDetails.name : '',
-                    image: item.videoDetails.image ? item.videoDetails.image : '',
-                    videoUrl: item.videoDetails.videoUrl ? item.videoDetails.videoUrl : '',
-                    embedCode: item.videoDetails.embedCode ? item.videoDetails.embedCode : '',
-                    duration: item.videoDetails.duration ? item.videoDetails.duration : ''
-                }
+        while (true) {
+            const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=${videosBatchPage}&contentType=videos&tag=${chapterSlug}`;
+            const headers = {
+                'Authorization': `Bearer ${token}`
             };
-            extractedData.push(extractedItem);
-        });
+            const response = await fetch(url, { headers });
+            if (!response.ok) {
+                const status = response.status;
+                if (status === 429 && retryCount > 0) {
+                    console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    // Retry the request
+                    return await videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page, retryCount - 1);
+                } else {
+                    throw new Error(`HTTP error! status: ${status}`);
+                }
+            }
+            const data = await response.json();
+            if(!(data && data.data && data.data.length >= 1)){
+                break;
+            }
+            data.data.forEach(item => {
+                const extractedItem = {
+                    topic: item.topic,
+                    date: item.date,
+                    videoDetails: {
+                        name: item.videoDetails.name ? item.videoDetails.name : '',
+                        image: item.videoDetails.image ? item.videoDetails.image : '',
+                        videoUrl: item.videoDetails.videoUrl ? item.videoDetails.videoUrl : '',
+                        embedCode: item.videoDetails.embedCode ? item.videoDetails.embedCode : '',
+                        duration: item.videoDetails.duration ? item.videoDetails.duration : ''
+                    }
+                };
+                extractedData.push(extractedItem);
+            });
+            videosBatchPage++;
+        }
         const extractedJson = {
             data: extractedData
         };
@@ -150,37 +169,44 @@ async function videosBatch(token, batchNameSlug, subjectSlug, chapterSlug, page 
 }
 
 async function videoNotes(token, batchNameSlug, subjectSlug, chapterSlug, retryCount = 3) {
-    const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=1&contentType=notes&tag=${chapterSlug}`;
-    const headers = {
-        'Authorization': `Bearer ${token}`
-    };
-
+    let notesPage = 1;
+    const extractedData = [];
     try {
-        const response = await fetch(url, { headers });
-        if (!response.ok) {
-            const status = response.status;
-            if (status === 429 && retryCount > 0) {
-                console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                // Retry the request
-                return await videoNotes(token, batchNameSlug, subjectSlug, chapterSlug, retryCount - 1);
-            } else {
-                throw new Error(`HTTP error! status: ${status}`);
+        while (true) {
+            const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=${notesPage}&contentType=notes&tag=${chapterSlug}`;
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+
+            const response = await fetch(url, { headers });
+            if (!response.ok) {
+                const status = response.status;
+                if (status === 429 && retryCount > 0) {
+                    console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    // Retry the request
+                    return await videoNotes(token, batchNameSlug, subjectSlug, chapterSlug, retryCount - 1);
+                } else {
+                    throw new Error(`HTTP error! status: ${status}`);
+                }
             }
-        }
-        const data = await response.json();
-        const extractedData = [];
-        data.data.forEach(item => {
-            item.homeworkIds.forEach(homework => {
-                const extractedItem = {
-                    topic: homework.topic ? homework.topic : '',
-                    note: homework.note ? homework.note : '',
-                    pdfName: homework.attachmentIds[0].name ? homework.attachmentIds[0].name : '',
-                    pdfUrl: `${homework.attachmentIds[0].baseUrl}${homework.attachmentIds[0].key}`
-                };
-                extractedData.push(extractedItem);
+            const data = await response.json();
+            if (!(data && data.data && data.data.length >= 1 && data.data[0].homeworkIds && data.data[0].homeworkIds.length >= 1)) {
+                break;
+            }
+            data.data.forEach(item => {
+                item.homeworkIds.forEach(homework => {
+                    const extractedItem = {
+                        topic: homework.topic ? homework.topic : '',
+                        note: homework.note ? homework.note : '',
+                        pdfName: homework.attachmentIds[0].name ? homework.attachmentIds[0].name : '',
+                        pdfUrl: `${homework.attachmentIds[0].baseUrl}${homework.attachmentIds[0].key}`
+                    };
+                    extractedData.push(extractedItem);
+                });
             });
-        });
+        }
+
         const extractedJson = {
             data: extractedData
         };
@@ -192,37 +218,45 @@ async function videoNotes(token, batchNameSlug, subjectSlug, chapterSlug, retryC
 }
 
 async function dppQuestions(token, batchNameSlug, subjectSlug, chapterSlug, retryCount = 3) {
-    const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=1&contentType=DppNotes&tag=${chapterSlug}`;
-    const headers = {
-        'Authorization': `Bearer ${token}`
-    };
+    let dppQuestionsPages = 1;
+    const extractedData = [];
 
     try {
-        const response = await fetch(url, { headers });
-        if (!response.ok) {
-            const status = response.status;
-            if (status === 429 && retryCount > 0) {
-                console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                // Retry the request
-                return await dppQuestions(token, batchNameSlug, subjectSlug, chapterSlug, retryCount - 1);
-            } else {
-                throw new Error(`HTTP error! status: ${status}`);
+        while (dppQuestionsPages++) {
+            const url = `https://api.penpencil.co/v2/batches/${batchNameSlug}/subject/${subjectSlug}/contents?page=${dppQuestionsPages}&contentType=DppNotes&tag=${chapterSlug}`;
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+
+
+            const response = await fetch(url, { headers });
+            if (!response.ok) {
+                const status = response.status;
+                if (status === 429 && retryCount > 0) {
+                    console.warn(`Received 429 status, retrying... (Attempts left: ${retryCount})`);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    // Retry the request
+                    return await dppQuestions(token, batchNameSlug, subjectSlug, chapterSlug, retryCount - 1);
+                } else {
+                    throw new Error(`HTTP error! status: ${status}`);
+                }
             }
-        }
-        const data = await response.json();
-        const extractedData = [];
-        data.data.forEach(item => {
-            item.homeworkIds.forEach(homework => {
-                const extractedItem = {
-                    topic: homework.topic ? homework.topic : '',
-                    note: homework.note ? homework.note : '',
-                    pdfName: homework.attachmentIds[0].name ? homework.attachmentIds[0].name : '',
-                    pdfUrl: `${homework.attachmentIds[0].baseUrl}${homework.attachmentIds[0].key}`
-                };
-                extractedData.push(extractedItem);
+            const data = await response.json();
+            if (!(data && data.data && data.data.length >= 1 && data.data[0].homeworkIds.length >= 1)) {
+                break;
+            }
+            data.data.forEach(item => {
+                item.homeworkIds.forEach(homework => {
+                    const extractedItem = {
+                        topic: homework.topic ? homework.topic : '',
+                        note: homework.note ? homework.note : '',
+                        pdfName: homework.attachmentIds[0].name ? homework.attachmentIds[0].name : '',
+                        pdfUrl: `${homework.attachmentIds[0].baseUrl}${homework.attachmentIds[0].key}`
+                    };
+                    extractedData.push(extractedItem);
+                });
             });
-        });
+        }
         const extractedJson = {
             data: extractedData
         };

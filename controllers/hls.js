@@ -1,84 +1,86 @@
+import { request } from 'express';
 import fetch from 'node-fetch';
 import { DOMParser } from 'xmldom';
+import { Token } from '../models/batches.js'
 
 const convertMPDToHLS = async (mpdId, quality) => {
     try {
-        let mpdUrl = `https://d1d34p8vz63oiq.cloudfront.net/${mpdId}/master.mpd`;
+        let db = await Token.findOne();
+        const access_token = db.access_token;
+        const refresh_token = db.refresh_token;
 
-        // Fetch the MPD file
-        const response = await fetch(mpdUrl);
-        const xmlText = await response.text();
+        console.log(access_token, refresh_token)
 
-        // const mpdId = mpdUrl.split('/').slice(-2, -1)[0];
-        // console.log(mpdId);
-
-        // Parse the MPD XML
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, "application/xml");
-
-        // Find the 720p representation
-        const adaptationSets = xmlDoc.getElementsByTagName("AdaptationSet");
-        let representation = null;
-        for (let i = 0; i < adaptationSets.length; i++) {
-            const reps = adaptationSets[i].getElementsByTagName("Representation");
-            for (let j = 0; j < reps.length; j++) {
-                if (reps[j].getAttribute("width") === "1280" && reps[j].getAttribute("height") === quality) {
-                    representation = reps[j];
-                    break;
-                }
-                else if (reps[j].getAttribute("height") === quality) {
-                    representation = reps[j];
-                    break;
-                }
+        const verifyToken = async (token) => {
+            try {
+                const response = await fetch('https://api.penpencil.co/v3/oauth/verify-token', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'randomId': 'ae9e92ac-b162-4089-9830-1236bddf9761'
+                    }
+                });
+                const data = await response.json();
+                return data.data.isVerified;
+            } catch (error) {
+                return false;
             }
-            if (representation) break;
-        }
+        };
 
-        if (!representation) {
-            throw new Error(`${quality}p representation not found`);
-        }
+        const refreshToken = async () => {
+            try {
+                const response = await fetch('https://api.penpencil.co/v3/oauth/refresh-token', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${access_token}`,
+                        'randomId': 'ae9e92ac-b162-4089-9830-1236bddf9761',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "refresh_token": refresh_token,
+                        "client_id": "system-admin"
+                    })
+                });
+                const data = await response.json();
+                await Token.findOneAndUpdate({},
+                    {
+                        access_token: data.data.access_token,
+                        refresh_token: data.data.refresh_token
+                    },
+                    { new: true, upsert: true }
+                );
 
-        // Extract segments and durations
-        const segmentTemplate = representation.getElementsByTagName("SegmentTemplate")[0];
-        const media = segmentTemplate.getAttribute("media");
-        const initialization = segmentTemplate.getAttribute("initialization");
-        const timescale = parseInt(segmentTemplate.getAttribute("timescale"));
-        const segments = segmentTemplate.getElementsByTagName("S");
-
-        // Base URL for segments
-        const baseUrl = `https://d1bppx4iuv3uee.cloudfront.net/${mpdId}/hls/${quality}/`;
-        const segmentExtension = '.ts';
-
-        // Generate HLS playlist
-        let hlsPlaylist = "#EXTM3U\n";
-        hlsPlaylist += "#EXT-X-VERSION:3\n";
-        hlsPlaylist += "#EXT-X-TARGETDURATION:6\n";
-        hlsPlaylist += "#EXT-X-MEDIA-SEQUENCE:0\n";
-        hlsPlaylist += "#EXT-X-PLAYLIST-TYPE:VOD\n";
-
-        // Add key (optional, modify as needed)
-        // hlsPlaylist += `#EXT-X-KEY:METHOD=AES-128,URI="https://dl.pwjarvis.com/api/get-hls-key?id=${mpdId}",IV=0x00000000000000000000000000000000\n`;
-        hlsPlaylist += `#EXT-X-KEY:METHOD=AES-128,URI="https://pw-pv7y.onrender.com/get-hls-key?id=${mpdId}",IV=0x00000000000000000000000000000000\n`;
-
-        // Add media segments
-        let segmentNumber = parseInt(segmentTemplate.getAttribute("startNumber")) - 1;
-        for (let i = 0; i < segments.length; i++) {
-            const segment = segments[i];
-            const duration = parseInt(segment.getAttribute("d")) / timescale;
-            const repeat = segment.getAttribute("r") ? parseInt(segment.getAttribute("r")) : 0;
-
-            for (let j = 0; j <= repeat; j++) {
-                const segmentUrl = `${baseUrl}${segmentNumber.toString().padStart(3, '0')}${segmentExtension}`;
-                hlsPlaylist += `#EXTINF:${duration.toFixed(6)},\n\n`;
-                hlsPlaylist += `${segmentUrl}\n`;
-                segmentNumber++;
+                console.log("Token Updated");
+                return data.data.access_token;
+            } catch (error) {
+                console.log(error.message);
+                return null;
             }
+        };
+
+        let token = access_token;
+        let isTokenVerified = await verifyToken(token);
+        if (!isTokenVerified) {
+            token = await refreshToken();
+            if (!token) {
+                return null;
+            }
+            isTokenVerified = await verifyToken(token);
+        }
+        if (!isTokenVerified) {
+            return null;
         }
 
-        // End of playlist
-        hlsPlaylist += "#EXT-X-ENDLIST\n";
+        let mainUrl = `https://d1bppx4iuv3uee.cloudfront.net/${mpdId}/hls/${quality}`
+        let mpdUrl2 = `https://d1bppx4iuv3uee.cloudfront.net/${mpdId}/hls/${quality}/main.m3u8`;
 
-        return hlsPlaylist;
+        const main_data = await fetch(mpdUrl2);
+        const main_data2 = await main_data.text();
+        const pattern = /(\d{3,4}\.ts)/g;
+        const replacement = `${mainUrl}/$1`;
+        const newText = main_data2.replace(pattern, replacement).replace("enc.key", `enc.key&authorization=${token}`)
+
+        return newText;
     } catch (error) {
         console.error("Error converting MPD to HLS:", error);
     }

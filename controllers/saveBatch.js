@@ -109,51 +109,48 @@ async function saveSubjectData(token, batchSlug) {
 
 async function saveChapterData(token, batchSlug, subjectSlug, tagCount) {
     try {
-        let numPages = Math.ceil(tagCount / 20);
 
-        for (let page = 1; page <= numPages; page++) {
-            const chapterData = await subjectListDetails(token, batchSlug, subjectSlug, page);
+        const chapterData = await subjectListDetails(token, batchSlug, subjectSlug);
 
-            // Find the batch based on slug
-            const batch = await Batch.findOne({ slug: batchSlug });
-            if (!batch) {
-                console.error('Batch not found');
-                return;
-            }
+        // Find the batch based on slug
+        const batch = await Batch.findOne({ slug: batchSlug });
+        if (!batch) {
+            console.error('Batch not found');
+            return;
+        }
 
-            // Find the subject based on slug
-            const subject = batch.subjects.find(sub => sub.slug === subjectSlug);
-            if (!subject) {
-                console.error('Subject not found');
-                return;
-            }
+        // Find the subject based on slug
+        const subject = batch.subjects.find(sub => sub.slug === subjectSlug);
+        if (!subject) {
+            console.error('Subject not found');
+            return;
+        }
 
-            // Clear existing chapters in subject
-            subject.chapters = [];
+        // Clear existing chapters in subject
+        subject.chapters = [];
 
-            // Save chapter data under the subject
-            for (const chapter of chapterData.data) {
-                subject.chapters.push({
-                    name: chapter.name,
-                    type: chapter.type,
-                    typeId: chapter.typeId,
-                    displayOrder: chapter.displayOrder,
-                    notes: chapter.notes,
-                    exercises: chapter.exercises,
-                    videos: chapter.videos,
-                    slug: chapter.slug
-                });
-            }
-            await batch.save();
+        // Save chapter data under the subject
+        for (const chapter of chapterData.data) {
+            subject.chapters.push({
+                name: chapter.name,
+                type: chapter.type,
+                typeId: chapter.typeId,
+                displayOrder: chapter.displayOrder,
+                notes: chapter.notes,
+                exercises: chapter.exercises,
+                videos: chapter.videos,
+                slug: chapter.slug
+            });
+        }
+        await batch.save();
 
-            // Fetch and save video and notes data for each chapter
-            for (const chapter of chapterData.data) {
-                await saveVideoData(token, batchSlug, subjectSlug, chapter.slug);
-                await saveNotesData(token, batchSlug, subjectSlug, chapter.slug);
-                await saveDppsData(token, batchSlug, subjectSlug, chapter.slug);
-                await saveDppVideoData(token, batchSlug, subjectSlug, chapter.slug);
-                console.log("Chapter Saved ", chapter.name)
-            }
+        // Fetch and save video and notes data for each chapter
+        for (const chapter of chapterData.data) {
+            await saveVideoData(token, batchSlug, subjectSlug, chapter.slug);
+            await saveNotesData(token, batchSlug, subjectSlug, chapter.slug);
+            await saveDppsData(token, batchSlug, subjectSlug, chapter.slug);
+            await saveDppVideoData(token, batchSlug, subjectSlug, chapter.slug);
+            console.log("Chapter Saved ", chapter.name)
         }
     } catch (error) {
         console.error('Error saving chapter data:', error.message);
@@ -288,7 +285,7 @@ async function saveDppVideoData(token, batchSlug, subjectSlug, chapterSlug) {
                 kid: '',
                 k: ''
             }
-            
+
             chapter.dppVideosSch.push({
                 topic: video.topic,
                 date: video.date,
