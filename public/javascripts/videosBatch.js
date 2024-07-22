@@ -17,6 +17,16 @@ function downloadPdf(url, filename) {
     anchor.click();
 }
 
+function playVideoOnVlc(button, videoId) {
+    const qualityOptions = `
+        <a href="/redirect-to-vlc?v=${videoId}&quality=240" target="_blank">240p</a>
+        <a href="/redirect-to-vlc?v=${videoId}&quality=320" target="_blank">360p</a>
+        <a href="/redirect-to-vlc?v=${videoId}&quality=480" target="_blank">480p</a>
+        <a href="/redirect-to-vlc?v=${videoId}&quality=720" target="_blank">720p</a>
+    `;
+    button.innerHTML = qualityOptions;
+}
+
 function copyDownloadLink(videoId, event) {
     const dashboardLink = `https://pw-pv7y.onrender.com/download/${videoId}/master.m3u8`;
     // const dashboardLink = `https://pw-pv7y.onrender.com/hls?v=${videoId}&quality=720`;

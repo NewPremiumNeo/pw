@@ -60,10 +60,13 @@
                                         <%= video.videoDetails.name %>
                                     <% } %>
                                 </p>
-                            </div>
+                            </div>           
                                         <% if (video.videoDetails.videoUrl) { %>
                                             <% const parts=video.videoDetails.videoUrl.split('/'); const
                                                 videoId=parts[parts.length - 2]; %>
+                                                <div class="button-div" id="watchButton" onclick="event.stopPropagation(); playVideoOnVlc(this, '<%= videoId %>')">
+                                                    Watch on VLC
+                                                </div>
                                                 <div class="download"
                                                     onclick="event.stopPropagation(); copyDownloadLink('<%= videoId %>')">
                                                     <button>1dm Download Link</button>

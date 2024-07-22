@@ -253,6 +253,12 @@ router.post("/token/update", async (req, res) => {
   }
 });
 
+router.get("/redirect-to-vlc", async (req, res) => {
+  const vidID = req.query.v;
+  const quality = req.query.quality;
+  res.render('redirectToVlc', { vidID, quality })
+});
+
 
 
 export default router;

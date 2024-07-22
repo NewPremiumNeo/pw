@@ -146,7 +146,6 @@ async function saveChapterData(token, batchSlug, subjectSlug, tagCount) {
 
         // Fetch and save video and notes data for each chapter
         for (const chapter of chapterData.data) {
-            console.log(chapter, " Chapter ")
             await saveVideoData(token, batchSlug, subjectSlug, chapter.slug);
             await saveNotesData(token, batchSlug, subjectSlug, chapter.slug);
             await saveDppsData(token, batchSlug, subjectSlug, chapter.slug);
